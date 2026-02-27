@@ -1,0 +1,35 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bike",
+      "description": "Premium sports bike on a clean road",
+      "imageUrl": "https://picsum.photos/seed/bike1/1200/600",
+      "imageHint": "sports motorcycle"
+    },
+    {
+      "id": "scooter-1",
+      "description": "Modern city scooter",
+      "imageUrl": "https://picsum.photos/seed/scooter1/600/400",
+      "imageHint": "modern scooter"
+    },
+    {
+      "id": "bike-2",
+      "description": "Naked street bike",
+      "imageUrl": "https://picsum.photos/seed/bike2/600/400",
+      "imageHint": "street motorcycle"
+    },
+    {
+      "id": "bike-3",
+      "description": "Cruiser motorcycle",
+      "imageUrl": "https://picsum.photos/seed/bike3/600/400",
+      "imageHint": "cruiser motorcycle"
+    },
+    {
+      "id": "showroom",
+      "description": "Modern bike showroom interior",
+      "imageUrl": "https://picsum.photos/seed/showroom1/1200/800",
+      "imageHint": "motorcycle showroom"
+    }
+  ]
+}
