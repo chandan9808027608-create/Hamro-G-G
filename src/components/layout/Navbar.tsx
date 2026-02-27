@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from 'next/link';
@@ -21,13 +20,16 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-2 bg-primary rounded-xl group-hover:rotate-12 transition-transform duration-300">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="p-2.5 bg-primary rounded-2xl group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-primary/20">
               <Bike className="w-6 h-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="font-headline font-bold text-xl tracking-tight leading-none text-primary uppercase">G&G</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">auto enterprises</span>
+              <div className="flex items-baseline gap-1">
+                <span className="font-headline font-black text-xs tracking-widest text-muted-foreground uppercase leading-none">Hamro</span>
+              </div>
+              <span className="font-headline font-bold text-2xl tracking-tighter leading-none text-primary uppercase">G&G AUTO</span>
+              <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mt-0.5">enterprises</span>
             </div>
           </Link>
 

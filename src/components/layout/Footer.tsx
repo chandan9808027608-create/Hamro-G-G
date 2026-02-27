@@ -7,19 +7,22 @@ export function Footer() {
     <footer className="bg-primary text-white pt-12 pb-8 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="space-y-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="p-1 bg-secondary rounded-full">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="p-1 bg-white text-primary rounded-full group-hover:rotate-12 transition-transform">
               <Bike className="w-5 h-5" />
             </div>
-            <span className="font-headline font-bold text-lg uppercase">G&G auto enterprises</span>
+            <div className="flex flex-col">
+              <span className="font-headline font-bold text-lg uppercase leading-none">HAMRO G&G</span>
+              <span className="text-[8px] uppercase tracking-widest font-bold text-white/70">auto enterprises</span>
+            </div>
           </Link>
           <p className="text-sm text-white/70 leading-relaxed">
             Reliable second-hand bikes and scooters showroom in Nayabasti, Boudha. 
-            We offer sales, exchange, and servicing.
+            We offer sales, exchange, and servicing for all major brands.
           </p>
           <div className="flex gap-4">
-            <Link href="#" className="hover:text-secondary"><Facebook className="w-5 h-5" /></Link>
-            <Link href="#" className="hover:text-secondary"><Instagram className="w-5 h-5" /></Link>
+            <Link href="#" className="hover:text-secondary transition-colors"><Facebook className="w-5 h-5" /></Link>
+            <Link href="#" className="hover:text-secondary transition-colors"><Instagram className="w-5 h-5" /></Link>
           </div>
         </div>
 
@@ -49,15 +52,15 @@ export function Footer() {
           <h4 className="font-headline font-bold mb-4">Contact Us</h4>
           <ul className="space-y-3 text-sm text-white/70">
             <li className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-secondary" />
+              <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
               <span>{CONTACT_INFO.address}</span>
             </li>
             <li className="flex items-center gap-2">
-              <Phone className="w-4 h-4 shrink-0 text-secondary" />
+              <Phone className="w-4 h-4 shrink-0 text-white/60" />
               <span>{CONTACT_INFO.phone}</span>
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="w-4 h-4 shrink-0 text-secondary" />
+              <Mail className="w-4 h-4 shrink-0 text-white/60" />
               <span>{CONTACT_INFO.email}</span>
             </li>
           </ul>

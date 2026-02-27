@@ -6,8 +6,8 @@ import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'G&G auto enterprises - Best Second Hand Bikes in Kathmandu',
-  description: 'G&G auto enterprises provides reliable, inspected, and fairly priced second-hand two-wheelers in Kathmandu, Nepal.',
+  title: 'Hamro G&G auto enterprises - Best Second Hand Bikes in Kathmandu',
+  description: 'Hamro G&G auto enterprises provides reliable, inspected, and fairly priced second-hand two-wheelers in Kathmandu, Nepal.',
 };
 
 export default function RootLayout({
