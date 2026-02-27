@@ -1,9 +1,10 @@
+
 import { Hero } from '@/components/home/Hero';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { MOCK_VEHICLES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Shield, Clock, CheckCircle, ArrowRight } from 'lucide-react';
+import { Shield, Clock, CheckCircle, ArrowRight, Wrench, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
@@ -65,11 +66,48 @@ export default function Home() {
             <VehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}
         </div>
-        
-        <div className="mt-12 md:hidden">
-          <Button className="w-full h-14 rounded-2xl text-lg font-bold" asChild>
-            <Link href="/inventory">View All Inventory</Link>
-          </Button>
+      </section>
+
+      {/* Service Booking Section */}
+      <section className="max-w-7xl mx-auto px-4">
+        <div className="bg-gray-50 rounded-[3rem] p-8 md:p-16 flex flex-col lg:flex-row gap-12 items-center border">
+          <div className="flex-1 space-y-6">
+            <Badge className="bg-secondary text-white border-none font-bold px-4 py-1">MAINTENANCE</Badge>
+            <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Professional <br /> Bike Servicing</h2>
+            <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
+              Don't wait for a breakdown. Get regular servicing from our expert mechanics. We use premium oil and genuine parts for all major brands.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="text-green-600 w-5 h-5" />
+                <span className="font-medium">90 Min Quick Service</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="text-green-600 w-5 h-5" />
+                <span className="font-medium">Genuine Spare Parts</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="text-green-600 w-5 h-5" />
+                <span className="font-medium">Pick-up & Drop Service</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="text-green-600 w-5 h-5" />
+                <span className="font-medium">Computerized Diagnosis</span>
+              </div>
+            </div>
+            <Button size="lg" className="h-16 px-10 bg-primary hover:bg-primary/90 text-lg font-bold rounded-2xl shadow-xl shadow-primary/20 gap-3" asChild>
+              <Link href="/book-service"><Calendar className="w-5 h-5" /> Book Appointment Now</Link>
+            </Button>
+          </div>
+          <div className="flex-1 relative group w-full lg:w-auto">
+            <div className="absolute -inset-4 bg-primary/10 rounded-[3rem] blur-xl" />
+            <img 
+              src="https://picsum.photos/seed/service/800/600" 
+              alt="Bike Service" 
+              className="relative w-full rounded-[2.5rem] shadow-2xl object-cover aspect-video lg:aspect-square"
+              data-ai-hint="mechanic service"
+            />
+          </div>
         </div>
       </section>
 

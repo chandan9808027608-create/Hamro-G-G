@@ -1,4 +1,5 @@
-import { Wrench, ShieldCheck, RefreshCw, FileText, BadgeCheck, Phone } from 'lucide-react';
+
+import { Wrench, ShieldCheck, RefreshCw, FileText, BadgeCheck, Phone, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { CONTACT_INFO } from '@/lib/constants';
@@ -9,31 +10,43 @@ export default function ServicesPage() {
       title: "Second Hand Sales",
       description: "Wide range of thoroughly inspected bikes and scooters across all budgets.",
       icon: <BadgeCheck className="w-10 h-10 text-primary" />,
+      link: "/inventory",
+      cta: "Explore Store"
     },
     {
       title: "Exchange Facility",
       description: "Upgrade your old two-wheeler with a better model at the best market rates.",
       icon: <RefreshCw className="w-10 h-10 text-primary" />,
+      link: "/exchange",
+      cta: "Get Appraisal"
     },
     {
       title: "Servicing & Repair",
       description: "Full-service mechanical workshop with expert mechanics for all brands.",
       icon: <Wrench className="w-10 h-10 text-primary" />,
+      link: "/book-service",
+      cta: "Book Appointment"
     },
     {
       title: "Insurance Renewal",
       description: "Get your vehicle insurance renewed instantly at our showroom.",
       icon: <ShieldCheck className="w-10 h-10 text-primary" />,
+      link: "/contact",
+      cta: "Enquire Now"
     },
     {
       title: "Ownership Transfer",
       description: "We handle all the paperwork for legal and smooth ownership transfer.",
       icon: <FileText className="w-10 h-10 text-primary" />,
+      link: "/contact",
+      cta: "Learn More"
     },
     {
       title: "Free Appraisal",
       description: "Not sure how much your bike is worth? Get a free professional valuation.",
       icon: <Phone className="w-10 h-10 text-primary" />,
+      link: "/sell",
+      cta: "Value My Bike"
     }
   ];
 
@@ -46,25 +59,29 @@ export default function ServicesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {services.map((service, index) => (
-          <div key={index} className="bg-white p-8 rounded-2xl shadow-sm border hover:shadow-md transition-shadow flex flex-col items-center text-center space-y-4">
-            <div className="bg-primary/5 p-4 rounded-full mb-2">
+          <div key={index} className="bg-white p-8 rounded-[2rem] shadow-sm border hover:shadow-xl hover:border-primary/20 transition-all flex flex-col items-center text-center space-y-4 group">
+            <div className="bg-primary/5 p-4 rounded-2xl mb-2 group-hover:bg-primary group-hover:text-white transition-colors">
               {service.icon}
             </div>
             <h3 className="font-headline font-bold text-xl">{service.title}</h3>
-            <p className="text-muted-foreground leading-relaxed">{service.description}</p>
+            <p className="text-muted-foreground leading-relaxed flex-grow">{service.description}</p>
+            <Button variant="link" className="text-primary font-bold gap-2 p-0 h-auto" asChild>
+              <Link href={service.link}>{service.cta} <CalendarCheck className="w-4 h-4" /></Link>
+            </Button>
           </div>
         ))}
       </div>
 
-      <div className="bg-primary p-12 rounded-3xl text-white text-center space-y-6">
-        <h2 className="font-headline font-bold text-3xl">Need Urgent Servicing?</h2>
-        <p className="text-white/80 max-w-xl mx-auto">Call us to book a service slot or visit our Boudha workshop directly.</p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button size="lg" className="bg-secondary text-white hover:bg-secondary/90 font-bold" asChild>
-            <a href={`tel:${CONTACT_INFO.phone}`}>Call: {CONTACT_INFO.phone}</a>
+      <div className="bg-primary p-12 rounded-[3rem] text-white text-center space-y-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
+        <h2 className="font-headline font-bold text-3xl md:text-4xl">Need Quick Servicing?</h2>
+        <p className="text-white/80 max-w-xl mx-auto text-lg">Book an appointment online or visit our Nayabasti workshop directly for express repair services.</p>
+        <div className="flex flex-col sm:flex-row justify-center gap-6 pt-4">
+          <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-bold h-14 px-8 rounded-2xl text-lg shadow-xl" asChild>
+            <Link href="/book-service">Book Appointment Online</Link>
           </Button>
-          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary" asChild>
-            <Link href="/contact">Get Directions</Link>
+          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary font-bold h-14 px-8 rounded-2xl text-lg" asChild>
+            <a href={`tel:${CONTACT_INFO.phone}`}>Call: {CONTACT_INFO.phone}</a>
           </Button>
         </div>
       </div>

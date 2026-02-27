@@ -1,8 +1,9 @@
+
 "use client"
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Bike } from 'lucide-react';
+import { Menu, X, Bike, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function Navbar() {
@@ -25,7 +26,7 @@ export function Navbar() {
               <Bike className="w-6 h-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="font-headline font-bold text-xl tracking-tight leading-none text-primary">G&G</span>
+              <span className="font-headline font-bold text-xl tracking-tight leading-none text-primary uppercase">G&G</span>
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">auto enterprises</span>
             </div>
           </Link>
@@ -42,9 +43,14 @@ export function Navbar() {
               </Link>
             ))}
             <div className="h-6 w-px bg-gray-200 mx-2" />
-            <Button className="font-bold rounded-full px-6 shadow-lg shadow-primary/20" asChild>
-              <Link href="/inventory">Browse Bikes</Link>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" className="font-bold text-primary gap-2" asChild>
+                <Link href="/book-service"><Wrench className="w-4 h-4" /> Book Service</Link>
+              </Button>
+              <Button className="font-bold rounded-full px-6 shadow-lg shadow-primary/20" asChild>
+                <Link href="/inventory">Browse Bikes</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -73,6 +79,13 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
+            <Link
+              href="/book-service"
+              className="block px-4 py-3 rounded-xl text-base font-semibold text-primary hover:bg-primary/5 transition-all flex items-center gap-2"
+              onClick={() => setIsOpen(false)}
+            >
+              <Wrench className="w-4 h-4" /> Book Appointment
+            </Link>
             <div className="pt-4">
               <Button className="w-full h-12 rounded-xl font-bold" asChild onClick={() => setIsOpen(false)}>
                 <Link href="/inventory">Browse Inventory</Link>
