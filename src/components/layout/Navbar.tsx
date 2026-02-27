@@ -1,12 +1,15 @@
+
 "use client"
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Bike, Wrench } from 'lucide-react';
+import { Menu, X, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const logoImage = PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -21,8 +24,13 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="p-2.5 bg-primary rounded-2xl group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-primary/20">
-              <Bike className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-white rounded-xl group-hover:rotate-6 transition-transform duration-300 shadow-md border overflow-hidden flex items-center justify-center p-1">
+              <img 
+                src={logoImage} 
+                alt="Hamro G&G Logo" 
+                className="w-full h-full object-contain"
+                data-ai-hint="business logo"
+              />
             </div>
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">

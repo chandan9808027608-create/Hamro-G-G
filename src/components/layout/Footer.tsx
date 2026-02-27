@@ -1,15 +1,24 @@
+
 import Link from 'next/link';
-import { Bike, Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Footer() {
+  const logoImage = PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
+
   return (
     <footer className="bg-primary text-white pt-12 pb-8 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="space-y-4">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-1 bg-white text-primary rounded-full group-hover:rotate-12 transition-transform">
-              <Bike className="w-5 h-5" />
+            <div className="w-10 h-10 bg-white rounded-lg group-hover:rotate-6 transition-transform p-1 overflow-hidden flex items-center justify-center">
+              <img 
+                src={logoImage} 
+                alt="Logo" 
+                className="w-full h-full object-contain"
+                data-ai-hint="business logo"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-headline font-bold text-lg uppercase leading-none">HAMRO G&G</span>

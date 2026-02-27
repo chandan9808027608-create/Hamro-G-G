@@ -30,6 +30,12 @@
       "description": "Modern bike showroom interior",
       "imageUrl": "https://picsum.photos/seed/showroom1/1200/800",
       "imageHint": "motorcycle showroom"
+    },
+    {
+      "id": "logo",
+      "description": "Hamro G&G Auto Enterprises Logo",
+      "imageUrl": "https://picsum.photos/seed/gglogo/200/200",
+      "imageHint": "business logo"
     }
   ]
 }
