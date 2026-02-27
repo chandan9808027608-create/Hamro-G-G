@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from 'next/link';
@@ -28,7 +27,7 @@ export function Navbar() {
             <div className="p-1 bg-secondary rounded-full">
               <Bike className="w-6 h-6 text-white" />
             </div>
-            <span className="font-headline font-bold text-xl tracking-tight">G&G AUTO HUB</span>
+            <span className="font-headline font-bold text-xl tracking-tight uppercase">G&G auto enterprises</span>
           </Link>
 
           {/* Desktop Nav */}

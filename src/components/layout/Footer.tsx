@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { Bike, Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
@@ -12,7 +11,7 @@ export function Footer() {
             <div className="p-1 bg-secondary rounded-full">
               <Bike className="w-5 h-5" />
             </div>
-            <span className="font-headline font-bold text-lg">G&G AUTO HUB</span>
+            <span className="font-headline font-bold text-lg uppercase">G&G auto enterprises</span>
           </Link>
           <p className="text-sm text-white/70 leading-relaxed">
             Reliable second-hand bikes and scooters showroom in Samakhusi, Kathmandu. 
