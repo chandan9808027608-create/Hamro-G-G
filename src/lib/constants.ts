@@ -1,6 +1,6 @@
 export const CONTACT_INFO = {
-  phone: '+977-9800000000',
-  whatsapp: '9779800000000',
+  phone: '9860087161',
+  whatsapp: '9779860087161',
   email: 'info@ggautonp.com',
   address: 'Nayabasti, Boudha (Everest Petrol Pump)',
   businessName: 'G&G auto enterprises'
