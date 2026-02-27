@@ -1,4 +1,3 @@
-
 import { Wrench, ShieldCheck, RefreshCw, FileText, BadgeCheck, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -59,7 +58,7 @@ export default function ServicesPage() {
 
       <div className="bg-primary p-12 rounded-3xl text-white text-center space-y-6">
         <h2 className="font-headline font-bold text-3xl">Need Urgent Servicing?</h2>
-        <p className="text-white/80 max-w-xl mx-auto">Call us to book a service slot or visit our Samakhusi workshop directly.</p>
+        <p className="text-white/80 max-w-xl mx-auto">Call us to book a service slot or visit our Boudha workshop directly.</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button size="lg" className="bg-secondary text-white hover:bg-secondary/90 font-bold" asChild>
             <a href={`tel:${CONTACT_INFO.phone}`}>Call: {CONTACT_INFO.phone}</a>

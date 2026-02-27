@@ -14,7 +14,7 @@ export function Footer() {
             <span className="font-headline font-bold text-lg uppercase">G&G auto enterprises</span>
           </Link>
           <p className="text-sm text-white/70 leading-relaxed">
-            Reliable second-hand bikes and scooters showroom in Samakhusi, Kathmandu. 
+            Reliable second-hand bikes and scooters showroom in Nayabasti, Boudha. 
             We offer sales, exchange, and servicing.
           </p>
           <div className="flex gap-4">
