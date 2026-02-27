@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { StickyBottomBar } from '@/components/layout/StickyBottomBar';
 import { Toaster } from '@/components/ui/toaster';
+import { TransitionProvider } from '@/components/layout/TransitionProvider';
 
 export const metadata: Metadata = {
   title: 'Hamro G&G auto enterprises - Best Second Hand Bikes in Kathmandu',
@@ -22,11 +23,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased min-h-screen flex flex-col">
+      <body className="font-body antialiased min-h-screen">
         <Navbar />
-        <main className="flex-grow pb-16 md:pb-0">
-          {children}
-        </main>
+        <TransitionProvider>
+          <main className="flex-grow pb-16 md:pb-0">
+            {children}
+          </main>
+        </TransitionProvider>
         <Footer />
         <StickyBottomBar />
         <Toaster />

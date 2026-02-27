@@ -25,6 +25,10 @@
     --ring: 0 84% 44%;
     --radius: 1rem;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer base {
@@ -47,4 +51,13 @@
 
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-red-600;
+}
+
+/* Custom smooth transition classes */
+.page-transition-enter {
+  @apply animate-in fade-in slide-in-from-bottom-2 duration-500 ease-out fill-mode-forwards;
+}
+
+button, a {
+  @apply transition-all duration-300 ease-in-out;
 }
