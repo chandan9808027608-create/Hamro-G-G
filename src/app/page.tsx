@@ -1,88 +1,99 @@
-
 import { Hero } from '@/components/home/Hero';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { MOCK_VEHICLES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Bike, CheckCircle, Clock, Shield } from 'lucide-react';
+import { Shield, Clock, CheckCircle, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
   const featuredVehicles = MOCK_VEHICLES.slice(0, 4);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-24 pb-20">
       <Hero />
 
-      {/* Highlights Section */}
-      <section className="max-w-7xl mx-auto px-4">
+      {/* Trust Badges / Stats Section */}
+      <section className="max-w-7xl mx-auto px-4 -mt-12 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border flex flex-col items-center text-center space-y-4">
-            <div className="bg-primary/10 p-4 rounded-full">
-              <Shield className="w-8 h-8 text-primary" />
+          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
+            <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
+              <Shield className="w-10 h-10" />
             </div>
-            <h3 className="font-headline font-bold text-xl">Verified Quality</h3>
-            <p className="text-muted-foreground">Every vehicle undergoes a 40-point inspection to ensure complete peace of mind.</p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl shadow-sm border flex flex-col items-center text-center space-y-4">
-            <div className="bg-secondary/10 p-4 rounded-full">
-              <Clock className="w-8 h-8 text-secondary" />
-            </div>
-            <h3 className="font-headline font-bold text-xl">Quick Exchange</h3>
-            <p className="text-muted-foreground">Get the best market valuation for your old ride and upgrade instantly.</p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl shadow-sm border flex flex-col items-center text-center space-y-4">
-            <div className="bg-primary/10 p-4 rounded-full">
-              <CheckCircle className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="font-headline font-bold text-xl">Easy Ownership</h3>
-            <p className="text-muted-foreground">We handle all documentation and transfer processes for a hassle-free experience.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Vehicles */}
-      <section className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-end mb-10">
             <div className="space-y-2">
-              <Badge className="bg-secondary text-white">HOT ARRIVALS</Badge>
-              <h2 className="font-headline font-bold text-3xl">Featured Inventory</h2>
+              <h3 className="font-headline font-bold text-2xl">Verified Quality</h3>
+              <p className="text-muted-foreground leading-relaxed">Every vehicle undergoes a rigorous 40-point expert inspection process.</p>
             </div>
-            <Link href="/inventory" className="text-primary font-bold hover:underline hidden sm:block">
-              View All Inventory →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredVehicles.map(vehicle => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
-            ))}
           </div>
           
-          <div className="mt-10 sm:hidden">
-            <Button className="w-full bg-primary" asChild>
-              <Link href="/inventory">View All Inventory</Link>
-            </Button>
+          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
+            <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
+              <Clock className="w-10 h-10" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-headline font-bold text-2xl">Quick Exchange</h3>
+              <p className="text-muted-foreground leading-relaxed">Upgrade your ride in minutes with the best market valuation for your old bike.</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
+            <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
+              <CheckCircle className="w-10 h-10" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-headline font-bold text-2xl">Smooth Transfer</h3>
+              <p className="text-muted-foreground leading-relaxed">Hassle-free ownership and document transfer handled entirely by our experts.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Simple CTA */}
-      <section className="max-w-7xl mx-auto px-4 pb-16">
-        <div className="bg-secondary p-8 md:p-12 rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-4 max-w-xl text-center md:text-left">
-            <h2 className="font-headline font-bold text-3xl md:text-4xl">Ready to Upgrade?</h2>
-            <p className="text-white/90 text-lg">Bring your old bike or scooter and walk out with a newer model today. We offer the best exchange rates in Kathmandu.</p>
+      {/* Featured Vehicles Section */}
+      <section className="max-w-7xl mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 text-center md:text-left gap-6">
+          <div className="space-y-4">
+            <Badge className="bg-primary/10 text-primary border-none font-bold px-4 py-1">HOT ARRIVALS</Badge>
+            <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Featured <br className="hidden md:block" /> Inventory</h2>
           </div>
-          <div className="flex gap-4">
-            <Button size="lg" className="bg-white text-secondary hover:bg-white/90 font-bold" asChild>
-              <Link href="/exchange">Get Appraisal</Link>
-            </Button>
+          <Link href="/inventory" className="group flex items-center gap-2 text-primary font-bold text-lg hover:underline transition-all">
+            View Full Inventory <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {featuredVehicles.map(vehicle => (
+            <VehicleCard key={vehicle.id} vehicle={vehicle} />
+          ))}
+        </div>
+        
+        <div className="mt-12 md:hidden">
+          <Button className="w-full h-14 rounded-2xl text-lg font-bold" asChild>
+            <Link href="/inventory">View All Inventory</Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* Modern CTA Section */}
+      <section className="max-w-7xl mx-auto px-4">
+        <div className="relative rounded-[3rem] overflow-hidden bg-primary py-16 px-8 md:px-20 text-white shadow-2xl shadow-primary/30">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl -ml-24 -mb-24" />
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="space-y-6 max-w-2xl text-center lg:text-left">
+              <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Ready to Upgrade <br /> Your Journey?</h2>
+              <p className="text-white/80 text-xl leading-relaxed">
+                Bring your old bike or scooter and walk out with a newer model today. We offer the most transparent and competitive exchange rates in Kathmandu.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-6 w-full lg:w-auto">
+              <Button size="lg" className="h-16 px-10 bg-white text-primary hover:bg-gray-100 font-bold text-xl rounded-2xl shadow-xl" asChild>
+                <Link href="/exchange">Get Free Appraisal</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
     </div>
   );
 }
-
-import { Badge } from '@/components/ui/badge';
