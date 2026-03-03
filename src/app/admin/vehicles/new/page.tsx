@@ -12,8 +12,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Save, ChevronLeft, Loader2 } from 'lucide-react';
+import { Sparkles, Save, ChevronLeft, Loader2, Image as ImageIcon } from 'lucide-react';
 import { generateVehicleDescription } from '@/ai/flows/generate-vehicle-description';
+import { useFirestore, addDocumentNonBlocking } from '@/firebase';
+import { collection, serverTimestamp } from 'firebase/firestore';
 
 const formSchema = z.object({
   title: z.string().min(5),
@@ -25,17 +27,19 @@ const formSchema = z.object({
   price: z.coerce.number().min(1),
   condition: z.string().min(1),
   description: z.string().min(10),
+  imageUrl: z.string().url("Please enter a valid image URL").optional().or(z.literal("")),
 });
 
 export default function AddVehiclePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [generating, setGenerating] = useState(false);
+  const db = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "", brand: "", model: "", type: "bike", year: 2022, kmRun: 0, price: 0, condition: "Excellent", description: ""
+      title: "", brand: "", model: "", type: "bike", year: 2022, kmRun: 0, price: 0, condition: "Excellent", description: "", imageUrl: ""
     },
   });
 
@@ -66,8 +70,27 @@ export default function AddVehiclePage() {
     }
   }
 
-  function onSubmit(values: any) {
-    console.log(values);
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!db) return;
+    
+    const vehiclesRef = collection(db, 'vehicles');
+    const vehicleData = {
+      title: values.title,
+      brand: values.brand,
+      model: values.model,
+      type: values.type,
+      year: values.year,
+      km_run: values.kmRun,
+      price: values.price,
+      condition: values.condition,
+      description: values.description,
+      image_urls: values.imageUrl ? [values.imageUrl] : ['https://picsum.photos/seed/vehicle/600/400'],
+      status: 'available',
+      created_at: new Date().toISOString(),
+      featured: false
+    };
+
+    addDocumentNonBlocking(vehiclesRef, vehicleData);
     toast({ title: "Vehicle Added", description: "Successfully added to inventory." });
     router.push('/admin/dashboard');
   }
@@ -90,6 +113,25 @@ export default function AddVehiclePage() {
                   <FormItem className="col-span-full">
                     <FormLabel>Listing Title</FormLabel>
                     <FormControl><Input placeholder="e.g. Pristine Honda Dio BS6 2022" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem className="col-span-full">
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input placeholder="https://images.unsplash.com/..." {...field} />
+                        <div className="w-10 h-10 border rounded flex items-center justify-center shrink-0">
+                          <ImageIcon className="text-muted-foreground w-5 h-5" />
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormDescription>Link to an image of the vehicle (Unsplash or similar).</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

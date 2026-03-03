@@ -6,15 +6,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Wrench, CheckCircle2, Clock, ShieldCheck } from 'lucide-react';
+import { CalendarIcon, Wrench, CheckCircle2, Clock, ShieldCheck, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useFirestore, addDocumentNonBlocking } from '@/firebase';
+import { collection } from 'firebase/firestore';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -29,6 +31,8 @@ const formSchema = z.object({
 export default function BookServicePage() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const db = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,8 +45,23 @@ export default function BookServicePage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    if (!db) return;
+    setLoading(true);
+
+    const inquiryData = {
+      type: 'test-ride', // Mapping 'Service Booking' to 'test-ride' or similar type in our schema
+      name: values.name,
+      phone: values.phone,
+      message: `Service Booking: ${values.vehicle_model}. Type: ${values.service_type}. Preferred Date: ${format(values.preferred_date, "PPP")}`,
+      created_at: new Date().toISOString(),
+      status: 'new'
+    };
+
+    const inquiriesRef = collection(db, 'inquiries');
+    addDocumentNonBlocking(inquiriesRef, inquiryData);
+
     setSubmitted(true);
+    setLoading(false);
     toast({
       title: "Appointment Requested",
       description: "Our service team will call you to confirm your slot.",
@@ -101,18 +120,6 @@ export default function BookServicePage() {
                 <p className="font-bold text-lg">Genuine Parts</p>
                 <p className="text-muted-foreground">We only use certified OEM parts and high-quality lubricants.</p>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-secondary p-8 rounded-[2.5rem] text-white space-y-4 shadow-xl">
-            <p className="font-bold text-xl">Service Hours</p>
-            <div className="flex justify-between text-white/80 text-sm">
-              <span>Sunday - Friday</span>
-              <span className="font-bold text-white">10:00 AM - 6:00 PM</span>
-            </div>
-            <div className="flex justify-between text-white/80 text-sm">
-              <span>Saturday</span>
-              <span className="font-bold text-white">Closed</span>
             </div>
           </div>
         </div>
@@ -225,12 +232,9 @@ export default function BookServicePage() {
                 </div>
                 
                 <div className="pt-6">
-                  <Button type="submit" className="w-full h-14 bg-primary text-xl font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform">
-                    Confirm Appointment Request
+                  <Button type="submit" disabled={loading} className="w-full h-14 bg-primary text-xl font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform">
+                    {loading ? <Loader2 className="animate-spin" /> : "Confirm Appointment Request"}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground mt-4">
-                    By booking, you agree to our service terms. We will call you within 30 minutes to confirm.
-                  </p>
                 </div>
               </form>
             </Form>

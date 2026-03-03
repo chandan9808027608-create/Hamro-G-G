@@ -1,20 +1,31 @@
 
+"use client"
+
 import { Hero } from '@/components/home/Hero';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
-import { MOCK_VEHICLES } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Shield, Clock, CheckCircle, ArrowRight, Wrench, Calendar } from 'lucide-react';
+import { Shield, Clock, CheckCircle, ArrowRight, Calendar, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { Vehicle } from '@/types/vehicle';
 
 export default function Home() {
-  const featuredVehicles = MOCK_VEHICLES.slice(0, 4);
+  const db = useFirestore();
+  const vehiclesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'vehicles');
+  }, [db]);
+
+  const { data: vehicles, isLoading } = useCollection<Vehicle>(vehiclesQuery);
+  const featuredVehicles = vehicles?.slice(0, 4) || [];
 
   return (
     <div className="space-y-24 pb-20">
       <Hero />
 
-      {/* Trust Badges / Stats Section */}
+      {/* Trust Badges */}
       <section className="max-w-7xl mx-auto px-4 -mt-12 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
@@ -26,7 +37,6 @@ export default function Home() {
               <p className="text-muted-foreground leading-relaxed">Every vehicle undergoes a rigorous 40-point expert inspection process.</p>
             </div>
           </div>
-          
           <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
             <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
               <Clock className="w-10 h-10" />
@@ -36,7 +46,6 @@ export default function Home() {
               <p className="text-muted-foreground leading-relaxed">Upgrade your ride in minutes with the best market valuation for your old bike.</p>
             </div>
           </div>
-
           <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-50 flex flex-col items-center text-center space-y-6 group hover:-translate-y-2 transition-transform duration-300">
             <div className="bg-primary/10 p-5 rounded-3xl group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
               <CheckCircle className="w-10 h-10" />
@@ -49,7 +58,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Vehicles Section */}
+      {/* Featured Vehicles */}
       <section className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 text-center md:text-left gap-6">
           <div className="space-y-4">
@@ -61,14 +70,25 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredVehicles.map(vehicle => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="py-20 flex justify-center">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredVehicles.map(vehicle => (
+              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+            ))}
+            {featuredVehicles.length === 0 && (
+              <div className="col-span-full py-10 text-center text-muted-foreground">
+                Check back soon for new inventory!
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
-      {/* Service Booking Section */}
+      {/* Service Section */}
       <section className="max-w-7xl mx-auto px-4">
         <div className="bg-gray-50 rounded-[3rem] p-8 md:p-16 flex flex-col lg:flex-row gap-12 items-center border">
           <div className="flex-1 space-y-6">
@@ -77,58 +97,12 @@ export default function Home() {
             <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
               Don't wait for a breakdown. Get regular servicing from our expert mechanics. We use premium oil and genuine parts for all major brands.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="text-green-600 w-5 h-5" />
-                <span className="font-medium">90 Min Quick Service</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="text-green-600 w-5 h-5" />
-                <span className="font-medium">Genuine Spare Parts</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="text-green-600 w-5 h-5" />
-                <span className="font-medium">Pick-up & Drop Service</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="text-green-600 w-5 h-5" />
-                <span className="font-medium">Computerized Diagnosis</span>
-              </div>
-            </div>
             <Button size="lg" className="h-16 px-10 bg-primary hover:bg-primary/90 text-lg font-bold rounded-2xl shadow-xl shadow-primary/20 gap-3" asChild>
               <Link href="/book-service"><Calendar className="w-5 h-5" /> Book Appointment Now</Link>
             </Button>
           </div>
           <div className="flex-1 relative group w-full lg:w-auto">
-            <div className="absolute -inset-4 bg-primary/10 rounded-[3rem] blur-xl" />
-            <img 
-              src="https://picsum.photos/seed/service/800/600" 
-              alt="Bike Service" 
-              className="relative w-full rounded-[2.5rem] shadow-2xl object-cover aspect-video lg:aspect-square"
-              data-ai-hint="mechanic service"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Modern CTA Section */}
-      <section className="max-w-7xl mx-auto px-4">
-        <div className="relative rounded-[3rem] overflow-hidden bg-primary py-16 px-8 md:px-20 text-white shadow-2xl shadow-primary/30">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl -ml-24 -mb-24" />
-          
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
-            <div className="space-y-6 max-w-2xl text-center lg:text-left">
-              <h2 className="font-headline font-bold text-4xl md:text-5xl leading-tight">Ready to Upgrade <br /> Your Journey?</h2>
-              <p className="text-white/80 text-xl leading-relaxed">
-                Bring your old bike or scooter and walk out with a newer model today. We offer the most transparent and competitive exchange rates in Kathmandu.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-6 w-full lg:w-auto">
-              <Button size="lg" className="h-16 px-10 bg-white text-primary hover:bg-gray-100 font-bold text-xl rounded-2xl shadow-xl" asChild>
-                <Link href="/exchange">Get Free Appraisal</Link>
-              </Button>
-            </div>
+            <img src="https://picsum.photos/seed/service/800/600" alt="Bike Service" className="relative w-full rounded-[2.5rem] shadow-2xl object-cover" />
           </div>
         </div>
       </section>

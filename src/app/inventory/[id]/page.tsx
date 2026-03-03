@@ -1,17 +1,36 @@
+
 "use client"
 
 import { useParams, useRouter } from 'next/navigation';
-import { MOCK_VEHICLES } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Gauge, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin } from 'lucide-react';
+import { Calendar, Gauge, Bike, ChevronLeft, Phone, MessageCircle, Share2, ShieldCheck, MapPin, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { CONTACT_INFO } from '@/lib/constants';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { Vehicle } from '@/types/vehicle';
 
 export default function VehicleDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const vehicle = MOCK_VEHICLES.find(v => v.id === id);
+  const db = useFirestore();
+  
+  const vehicleRef = useMemoFirebase(() => {
+    if (!db || !id) return null;
+    return doc(db, 'vehicles', id as string);
+  }, [db, id]);
+
+  const { data: vehicle, isLoading } = useDoc<Vehicle>(vehicleRef);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-40 flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="text-xl font-medium text-muted-foreground">Fetching vehicle details...</p>
+      </div>
+    );
+  }
 
   if (!vehicle) {
     return (
@@ -39,7 +58,7 @@ export default function VehicleDetailPage() {
         <div className="lg:col-span-8 space-y-6">
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm aspect-video relative group">
             <img 
-              src={vehicle.image_urls[0]} 
+              src={vehicle.image_urls?.[0] || 'https://picsum.photos/seed/vehicle/800/600'} 
               alt={vehicle.title} 
               className="w-full h-full object-cover"
             />

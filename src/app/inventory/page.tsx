@@ -2,12 +2,14 @@
 "use client"
 
 import { useState, useMemo } from 'react';
-import { MOCK_VEHICLES } from '@/lib/mock-data';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { BRANDS } from '@/lib/constants';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { Vehicle } from '@/types/vehicle';
 
 export default function InventoryPage() {
   const [search, setSearch] = useState('');
@@ -15,8 +17,18 @@ export default function InventoryPage() {
   const [brandFilter, setBrandFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('latest');
 
+  const db = useFirestore();
+  const vehiclesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'vehicles');
+  }, [db]);
+
+  const { data: dbVehicles, isLoading } = useCollection<Vehicle>(vehiclesQuery);
+
   const filteredVehicles = useMemo(() => {
-    return MOCK_VEHICLES.filter(v => {
+    if (!dbVehicles) return [];
+    
+    return dbVehicles.filter(v => {
       const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) || 
                            v.brand.toLowerCase().includes(search.toLowerCase());
       const matchesType = typeFilter === 'all' || v.type === typeFilter;
@@ -27,7 +39,7 @@ export default function InventoryPage() {
       if (sortOrder === 'price-high') return b.price - a.price;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-  }, [search, typeFilter, brandFilter, sortOrder]);
+  }, [dbVehicles, search, typeFilter, brandFilter, sortOrder]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -84,27 +96,34 @@ export default function InventoryPage() {
       </div>
 
       {/* Results */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredVehicles.length > 0 ? (
-          filteredVehicles.map(vehicle => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} />
-          ))
-        ) : (
-          <div className="col-span-full py-20 text-center space-y-4">
-            <div className="bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-              <Search className="w-8 h-8 text-muted-foreground" />
+      {isLoading ? (
+        <div className="py-20 flex flex-col items-center justify-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <p className="text-muted-foreground">Refreshing inventory...</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredVehicles.length > 0 ? (
+            filteredVehicles.map(vehicle => (
+              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center space-y-4">
+              <div className="bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                <Search className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="font-headline font-bold text-xl">No vehicles found</h3>
+              <p className="text-muted-foreground">Try adjusting your filters or search terms.</p>
+              <button 
+                onClick={() => {setSearch(''); setTypeFilter('all'); setBrandFilter('all');}}
+                className="text-primary font-bold hover:underline"
+              >
+                Clear all filters
+              </button>
             </div>
-            <h3 className="font-headline font-bold text-xl">No vehicles found</h3>
-            <p className="text-muted-foreground">Try adjusting your filters or search terms.</p>
-            <button 
-              onClick={() => {setSearch(''); setTypeFilter('all'); setBrandFilter('all');}}
-              className="text-primary font-bold hover:underline"
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
