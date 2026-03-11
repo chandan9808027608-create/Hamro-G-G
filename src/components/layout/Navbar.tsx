@@ -3,12 +3,15 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Wrench } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Menu, X, Wrench, LayoutDashboard, Bike } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const isAdminPage = pathname?.startsWith('/admin');
   const logoImage = PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
 
   const navLinks = [
@@ -18,6 +21,14 @@ export function Navbar() {
     { name: 'Sell Bike', href: '/sell' },
     { name: 'Exchange', href: '/exchange' },
   ];
+
+  const adminLinks = [
+    { name: 'Inventory', href: '/admin/dashboard' },
+    { name: 'Leads', href: '/admin/inquiries' },
+    { name: 'Add New', href: '/admin/vehicles/new' },
+  ];
+
+  const links = isAdminPage ? adminLinks : navLinks;
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
@@ -43,23 +54,35 @@ export function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
+            {links.map((link) => (
               <Link 
                 key={link.name} 
                 href={link.href}
-                className="text-sm font-semibold text-foreground/70 hover:text-primary transition-colors"
+                className={`text-sm font-semibold transition-colors ${
+                  pathname === link.href ? 'text-primary' : 'text-foreground/70 hover:text-primary'
+                }`}
               >
                 {link.name}
               </Link>
             ))}
+            
             <div className="h-6 w-px bg-gray-200 mx-2" />
+            
             <div className="flex items-center gap-3">
-              <Button variant="ghost" className="font-bold text-primary gap-2" asChild>
-                <Link href="/book-service"><Wrench className="w-4 h-4" /> Book Service</Link>
-              </Button>
-              <Button className="font-bold rounded-full px-6 shadow-lg shadow-primary/20" asChild>
-                <Link href="/inventory">Browse Bikes</Link>
-              </Button>
+              {isAdminPage ? (
+                <Button variant="outline" className="font-bold gap-2 rounded-full" asChild>
+                  <Link href="/"><Bike className="w-4 h-4" /> View Site</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" className="font-bold text-primary gap-2" asChild>
+                    <Link href="/book-service"><Wrench className="w-4 h-4" /> Book Service</Link>
+                  </Button>
+                  <Button className="font-bold rounded-full px-6 shadow-lg shadow-primary/20" asChild>
+                    <Link href="/inventory">Browse Bikes</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -79,7 +102,7 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-300">
           <div className="px-4 pt-4 pb-6 space-y-2">
-            {navLinks.map((link) => (
+            {links.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
@@ -89,16 +112,20 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link
-              href="/book-service"
-              className="block px-4 py-3 rounded-xl text-base font-semibold text-primary hover:bg-primary/5 transition-all flex items-center gap-2"
-              onClick={() => setIsOpen(false)}
-            >
-              <Wrench className="w-4 h-4" /> Book Appointment
-            </Link>
+            {!isAdminPage && (
+              <Link
+                href="/book-service"
+                className="block px-4 py-3 rounded-xl text-base font-semibold text-primary hover:bg-primary/5 transition-all flex items-center gap-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <Wrench className="w-4 h-4" /> Book Appointment
+              </Link>
+            )}
             <div className="pt-4">
               <Button className="w-full h-12 rounded-xl font-bold" asChild onClick={() => setIsOpen(false)}>
-                <Link href="/inventory">Browse Inventory</Link>
+                <Link href={isAdminPage ? "/admin/dashboard" : "/inventory"}>
+                  {isAdminPage ? "Go to Dashboard" : "Browse Inventory"}
+                </Link>
               </Button>
             </div>
           </div>
