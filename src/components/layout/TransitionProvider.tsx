@@ -4,19 +4,21 @@ import { usePathname } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 
 /**
- * TransitionProvider component handles premium page transition animations.
- * It uses the pathname as a key to trigger the re-render and a refined
- * CSS animation whenever the user navigates.
+ * TransitionProvider component handles high-speed page transition animations.
+ * Refined for a snappy "Experienced Developer" feel with reduced overhead.
  */
 export function TransitionProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [displayChildren, setDisplayChildren] = useState(children);
 
   useEffect(() => {
-    // Ensure the new children are set when the route changes
+    // Immediate children update for speed
     setDisplayChildren(children);
-    // Scroll to top on every navigation for a clean start
-    window.scrollTo(0, 0);
+    
+    // Smooth scroll to top without delay
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
   }, [children, pathname]);
 
   return (
