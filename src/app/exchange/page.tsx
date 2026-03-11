@@ -19,7 +19,7 @@ const formSchema = z.object({
   old_bike: z.string().min(2, "Please enter your current bike model"),
   old_year: z.string().min(4, "Enter manufacturing year"),
   interested_in: z.string().min(2, "What bike are you looking for?"),
-  image_url: z.string().url("Please enter a valid image URL").optional().or(z.literal("")),
+  images: z.array(z.string()).min(1, "Please upload at least one image for evaluation."),
 });
 
 export default function ExchangePage() {
@@ -36,9 +36,44 @@ export default function ExchangePage() {
       old_bike: "", 
       old_year: "", 
       interested_in: "",
-      image_url: ""
+      images: []
     },
   });
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const currentImages = form.getValues('images');
+    const newImages = [...currentImages];
+
+    for (let i = 0; i < files.length; i++) {
+      if (newImages.length >= 6) break;
+      try {
+        const base64 = await fileToBase64(files[i]);
+        newImages.push(base64);
+      } catch (err) {
+        console.error("Error reading file", err);
+      }
+    }
+
+    form.setValue('images', newImages, { shouldValidate: true });
+  };
+
+  const removeImage = (index: number) => {
+    const currentImages = form.getValues('images');
+    const filtered = currentImages.filter((_, i) => i !== index);
+    form.setValue('images', filtered, { shouldValidate: true });
+  };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!db) return;
@@ -48,10 +83,10 @@ export default function ExchangePage() {
       type: 'exchange',
       name: values.name,
       phone: values.phone,
-      message: `Exchange Inquiry: ${values.old_bike} (${values.old_year}) for ${values.interested_in}. Photo provided: ${values.image_url || 'None'}`,
+      message: `Exchange Inquiry: ${values.old_bike} (${values.old_year}) for ${values.interested_in}. Photos provided: ${values.images.length}`,
+      images: values.images,
       created_at: new Date().toISOString(),
       status: 'new',
-      // Store specific exchange details for admin
       sellExchangeVehicleBrand: values.old_bike.split(' ')[0] || values.old_bike,
       sellExchangeVehicleModel: values.old_bike,
       sellExchangeVehicleYear: parseInt(values.old_year) || 0,
@@ -65,7 +100,7 @@ export default function ExchangePage() {
       setLoading(false);
       toast({ 
         title: "Exchange Request Sent", 
-        description: "We'll review your bike details and call you with an offer." 
+        description: "We'll review your bike details and photos and call you with an offer." 
       });
     }, 800);
   }
@@ -97,7 +132,7 @@ export default function ExchangePage() {
         </div>
         <h1 className="text-5xl md:text-6xl font-bold font-headline tracking-tight text-gradient">Instant Exchange Facility</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Upgrade your ride in minutes. Provide your bike details and photos for a transparent, professional valuation.
+          Upgrade your ride in minutes. Upload your current bike photos for a transparent, professional valuation.
         </p>
       </div>
 
@@ -168,44 +203,44 @@ export default function ExchangePage() {
                 )} />
               </div>
 
-              <div className="col-span-full space-y-6 pt-4 border-t">
+              {/* Photo Upload Section */}
+              <div className="col-span-full space-y-6 pt-6 border-t">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold font-headline flex items-center gap-3">
-                    <Camera className="w-6 h-6 text-primary" /> Vehicle Photos
+                    <Camera className="w-6 h-6 text-primary" /> Vehicle Photos (Max 6)
                   </h3>
+                  <span className="text-[10px] text-muted-foreground font-bold">{form.watch('images').length} / 6</span>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField control={form.control} name="image_url" render={({ field }) => (
-                    <FormItem className="col-span-full">
-                      <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Photo URL (Front/Side view)</FormLabel>
-                      <FormControl>
-                        <div className="flex gap-3">
-                          <Input placeholder="https://images.unsplash.com/..." className="h-12 rounded-xl" {...field} />
-                          <div className="w-12 h-12 bg-gray-50 border rounded-xl flex items-center justify-center shrink-0">
-                            <ImageIcon className="text-muted-foreground w-6 h-6" />
-                          </div>
-                        </div>
-                      </FormControl>
-                      <FormDescription>Link to an image of your bike for evaluation.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                </div>
-
-                {form.watch('image_url') && (
-                  <div className="mt-4 animate-in fade-in slide-in-from-bottom-2">
-                    <p className="text-xs font-bold text-muted-foreground uppercase mb-2">Preview:</p>
-                    <div className="relative w-full aspect-video rounded-3xl overflow-hidden border-2 border-primary/10 shadow-lg">
-                      <img 
-                        src={form.watch('image_url')} 
-                        alt="Vehicle Preview" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => (e.currentTarget.src = 'https://placehold.co/600x400?text=Invalid+Image+URL')}
-                      />
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                  {form.watch('images').map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border group shadow-sm bg-gray-50">
+                      <img src={img} className="w-full h-full object-cover" alt={`Bike preview ${idx}`} />
+                      <button 
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </div>
-                  </div>
-                )}
+                  ))}
+                  {form.watch('images').length < 6 && (
+                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all text-muted-foreground hover:text-primary group">
+                      <Plus className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-bold uppercase">Upload</span>
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept="image/*" 
+                        multiple 
+                        onChange={handleImageUpload} 
+                      />
+                    </label>
+                  )}
+                </div>
+                <FormMessage>{form.formState.errors.images?.message}</FormMessage>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Provide clear photos of front, sides, and engine area for accurate pricing.</p>
               </div>
             </div>
 
