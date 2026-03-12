@@ -4,15 +4,35 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Wrench, LayoutDashboard, Bike } from 'lucide-react';
+import { Menu, X, Wrench, Bike, ShieldCheck, Settings, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/admin');
-  const logoImage = PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
+  const { user } = useUser();
+  const db = useFirestore();
+
+  const roleRef = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return doc(db, 'roles_admin', user.uid);
+  }, [db, user?.uid]);
+
+  const { data: roleData } = useDoc(roleRef);
+  const isSuperAdmin = roleData?.role === 'super_admin';
+
+  const settingsRef = useMemoFirebase(() => {
+    if (!db) return null;
+    return doc(db, 'settings', 'general');
+  }, [db]);
+  const { data: settings } = useDoc(settingsRef);
+
+  const logoImage = settings?.logo_url || PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
+  const businessName = settings?.business_name || "G&G AUTO";
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -25,7 +45,10 @@ export function Navbar() {
   const adminLinks = [
     { name: 'Inventory', href: '/admin/dashboard' },
     { name: 'Leads', href: '/admin/inquiries' },
-    { name: 'Add New', href: '/admin/vehicles/new' },
+    ...(isSuperAdmin ? [
+      { name: 'Roles', href: '/admin/roles', icon: <Users className="w-4 h-4" /> },
+      { name: 'Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" /> }
+    ] : [])
   ];
 
   const links = isAdminPage ? adminLinks : navLinks;
@@ -38,7 +61,7 @@ export function Navbar() {
             <div className="w-12 h-12 bg-white rounded-xl group-hover:rotate-6 transition-transform duration-300 shadow-md border overflow-hidden flex items-center justify-center p-1">
               <img 
                 src={logoImage} 
-                alt="Hamro G&G Logo" 
+                alt="Logo" 
                 className="w-full h-full object-contain"
                 data-ai-hint="business logo"
               />
@@ -47,7 +70,7 @@ export function Navbar() {
               <div className="flex items-baseline gap-1">
                 <span className="font-headline font-black text-xs tracking-widest text-muted-foreground uppercase leading-none">Hamro</span>
               </div>
-              <span className="font-headline font-bold text-2xl tracking-tighter leading-none text-primary uppercase">G&G AUTO</span>
+              <span className="font-headline font-bold text-2xl tracking-tighter leading-none text-primary uppercase">{businessName}</span>
               <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground mt-0.5">enterprises</span>
             </div>
           </Link>
@@ -58,10 +81,11 @@ export function Navbar() {
               <Link 
                 key={link.name} 
                 href={link.href}
-                className={`text-sm font-semibold transition-colors ${
+                className={`text-sm font-semibold transition-colors flex items-center gap-2 ${
                   pathname === link.href ? 'text-primary' : 'text-foreground/70 hover:text-primary'
                 }`}
               >
+                {link.icon}
                 {link.name}
               </Link>
             ))}
@@ -70,9 +94,12 @@ export function Navbar() {
             
             <div className="flex items-center gap-3">
               {isAdminPage ? (
-                <Button variant="outline" className="font-bold gap-2 rounded-full" asChild>
-                  <Link href="/"><Bike className="w-4 h-4" /> View Site</Link>
-                </Button>
+                <div className="flex items-center gap-3">
+                  {isSuperAdmin && <Badge className="bg-primary/10 text-primary border-primary/20">SUPER ADMIN</Badge>}
+                  <Button variant="outline" className="font-bold gap-2 rounded-full" asChild>
+                    <Link href="/"><Bike className="w-4 h-4" /> View Site</Link>
+                  </Button>
+                </div>
               ) : (
                 <>
                   <Button variant="ghost" className="font-bold text-primary gap-2" asChild>
@@ -106,9 +133,10 @@ export function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="block px-4 py-3 rounded-xl text-base font-semibold text-foreground/80 hover:bg-gray-50 hover:text-primary transition-all"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-foreground/80 hover:bg-gray-50 hover:text-primary transition-all"
                 onClick={() => setIsOpen(false)}
               >
+                {link.icon}
                 {link.name}
               </Link>
             ))}
@@ -121,13 +149,6 @@ export function Navbar() {
                 <Wrench className="w-4 h-4" /> Book Appointment
               </Link>
             )}
-            <div className="pt-4">
-              <Button className="w-full h-12 rounded-xl font-bold" asChild onClick={() => setIsOpen(false)}>
-                <Link href={isAdminPage ? "/admin/dashboard" : "/inventory"}>
-                  {isAdminPage ? "Go to Dashboard" : "Browse Inventory"}
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       )}

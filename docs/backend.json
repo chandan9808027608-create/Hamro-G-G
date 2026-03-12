@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Vehicle": {
@@ -125,6 +126,19 @@
         "role": { "type": "string", "enum": ["admin", "super_admin"] },
         "createdAt": { "type": "string", "format": "date-time" }
       }
+    },
+    "SiteSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SiteSettings",
+      "type": "object",
+      "description": "Global site configurations.",
+      "properties": {
+        "logo_url": { "type": "string" },
+        "business_name": { "type": "string" },
+        "contact_phone": { "type": "string" },
+        "contact_email": { "type": "string" },
+        "address": { "type": "string" }
+      }
     }
   },
   "auth": {
@@ -145,6 +159,10 @@
     "/roles_admin/{userId}": {
       "schema": { "$ref": "#/backend/entities/AdminRole" },
       "description": "Admin authorization mapping."
+    },
+    "/settings/general": {
+      "schema": { "$ref": "#/backend/entities/SiteSettings" },
+      "description": "Global site settings."
     }
   }
 }

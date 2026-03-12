@@ -1,11 +1,25 @@
 
+"use client"
+
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
-import { CONTACT_INFO } from '@/lib/constants';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Footer() {
-  const logoImage = PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
+  const db = useFirestore();
+  const settingsRef = useMemoFirebase(() => {
+    if (!db) return null;
+    return doc(db, 'settings', 'general');
+  }, [db]);
+  const { data: settings } = useDoc(settingsRef);
+
+  const logoImage = settings?.logo_url || PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
+  const businessName = settings?.business_name || "Hamro G&G Auto Enterprises";
+  const contactPhone = settings?.contact_phone || "9860087161";
+  const contactEmail = settings?.contact_email || "info@ggautonp.com";
+  const address = settings?.address || "Nayabasti, Boudha (Everest Petrol Pump)";
 
   return (
     <footer className="bg-primary text-white pt-12 pb-8 border-t border-white/10">
@@ -21,12 +35,12 @@ export function Footer() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-headline font-bold text-lg uppercase leading-none">HAMRO G&G</span>
+              <span className="font-headline font-bold text-lg uppercase leading-none">{businessName}</span>
               <span className="text-[8px] uppercase tracking-widest font-bold text-white/70">auto enterprises</span>
             </div>
           </Link>
           <p className="text-sm text-white/70 leading-relaxed">
-            Reliable second-hand bikes and scooters showroom in Nayabasti, Boudha. 
+            Reliable second-hand bikes and scooters showroom in {address.split(',')[0]}. 
             We offer sales, exchange, and servicing for all major brands.
           </p>
           <div className="flex gap-4">
@@ -62,21 +76,21 @@ export function Footer() {
           <ul className="space-y-3 text-sm text-white/70">
             <li className="flex items-start gap-2">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
-              <span>{CONTACT_INFO.address}</span>
+              <span>{address}</span>
             </li>
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 shrink-0 text-white/60" />
-              <span>{CONTACT_INFO.phone}</span>
+              <span>{contactPhone}</span>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-4 h-4 shrink-0 text-white/60" />
-              <span>{CONTACT_INFO.email}</span>
+              <span>{contactEmail}</span>
             </li>
           </ul>
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center text-xs text-white/40">
-        <p>&copy; {new Date().getFullYear()} {CONTACT_INFO.businessName}. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} {businessName}. All rights reserved.</p>
       </div>
     </footer>
   );

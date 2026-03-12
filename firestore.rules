@@ -1,32 +1,24 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * FIREBASE SECURITY RULES
-     * Role-Based Access Control (RBAC) model.
-     */
 
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** 
-     * Checks if the user has an entry in the roles_admin collection.
-     * This is the source of truth for administrative privileges.
-     */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
+    function isSuperAdmin() {
+      return isAdmin() && get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
     match /roles_admin/{userId} {
-      // Users can see their own role status
-      allow get: if isSignedIn() && request.auth.uid == userId;
-      // Only admins can list all admin roles
+      allow read: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
       allow list: if isAdmin();
-      // Allow any signed-in user to write (create/update) their own admin role document.
-      // We use 'write' to cover all mutation types for the bootstrap process.
-      allow write: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
     }
 
     match /vehicles/{vehicleId} {
@@ -39,19 +31,14 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
-    match /blogPosts/{blogPostId} {
+    match /settings/general {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSuperAdmin();
     }
 
-    match /services/{serviceId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /pageContents/{pageContentId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
+    // Legacy rules for other paths
+    match /blogPosts/{blogPostId} { allow read: if true; allow write: if isAdmin(); }
+    match /services/{serviceId} { allow read: if true; allow write: if isAdmin(); }
+    match /pageContents/{pageContentId} { allow read: if true; allow write: if isAdmin(); }
   }
 }
