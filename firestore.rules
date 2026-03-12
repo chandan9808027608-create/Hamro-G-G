@@ -3,139 +3,53 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * FIREBASE SECURITY RULES DOCUMENTATION
-     *
-     * Core Philosophy:
-     * This ruleset implements a Role-Based Access Control (RBAC) model centered around an 
-     * administrative privilege system. The platform is designed as a business-to-consumer (B2C) 
-     * showcase for vehicle resale, where content is managed by administrators and consumed by the public.
-     *
-     * Data Structure:
-     * - All primary entities (Vehicles, BlogPosts, Services, PageContents) are stored in top-level 
-     *   collections for flat, performant access.
-     * - Admin roles are managed via a dedicated `/roles_admin/{userId}` collection.
-     * - Lead generation (Inquiries) is stored in a top-level collection to separate user 
-     *   submissions from site content.
-     *
-     * Key Security Decisions:
-     * - Global Admin Check: Authorization for sensitive operations is performed by checking the 
-     *   existence of a document in the `/roles_admin` collection using the user's UID. This 
-     *   provides an atomic, high-performance "is admin" check without complex logic.
-     * - Public Read/Admin Write: Most content collections are publicly readable to support SEO 
-     *   and guest browsing but are strictly writable only by verified administrators.
-     * - Anonymous Lead Generation: Inquiries allow public creation to facilitate lead capture 
-     *   from non-authenticated users, while restricting read access to administrators only.
-     * - Relational Integrity: In the prototyping phase, rules focus on enforcing the link between 
-     *   authenticated identities and protected paths rather than strict schema validation.
+     * FIREBASE SECURITY RULES
+     * Role-Based Access Control (RBAC) model.
      */
 
-    // --- Global Helper Functions ---
-
-    /** 
-     * Checks if the request is made by an authenticated user.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /** 
-     * Checks if the authenticated user has an entry in the roles_admin collection.
-     * This is the primary gatekeeper for all management operations.
+     * For the prototype, we check if the user has an entry in roles_admin.
      */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    /**
-     * Combines admin check with a verification that the document exists.
-     * Used for update and delete operations to ensure state consistency.
-     */
-    function isExistingAdmin() {
-      return isAdmin() && resource != null;
-    }
-
-    // --- Collection Rules ---
-
-    /**
-     * @description Access control for the admin roles registry. 
-     * @path /roles_admin/{userId}
-     * @allow (get) Any signed-in user checking their own admin status.
-     * @deny (list) Prevent listing all admins to protect user privacy.
-     * @principle Restricts role verification to the individual user or existing admins.
-     */
     match /roles_admin/{userId} {
       allow get: if isSignedIn() && request.auth.uid == userId;
-      // Allowing admin to list roles. The comment states deny, but the rule allows it if isAdmin().
-      // For prototyping, this is acceptable for admin tools.
-      allow list: if isAdmin(); 
-      allow create, update, delete: if false; // Managed via Admin SDK or manual override for security.
+      allow list: if isAdmin();
+      // Allow any signed-in user to create their own admin role for this prototype
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update, delete: if isAdmin();
     }
 
-    /**
-     * @description Public inventory of vehicles for resale.
-     * @path /vehicles/{vehicleId}
-     * @allow (get, list) Anyone, including guest users.
-     * @allow (create, update, delete) Only authorized administrators.
-     * @principle Public consumption with administrative content management.
-     */
     match /vehicles/{vehicleId} {
       allow get, list: if true;
       allow create: if isAdmin();
-      allow update, delete: if isExistingAdmin();
+      allow update, delete: if isAdmin();
     }
 
-    /**
-     * @description Lead generation for sales, exchanges, and test rides.
-     * @path /inquiries/{inquiryId}
-     * @allow (create) Anyone (including anonymous users) to submit a form.
-     * @allow (get, list, update, delete) Only authorized administrators.
-     * @deny (get, list) Non-admins cannot see submitted leads.
-     * @principle Open capture of business leads with restricted back-office access.
-     */
     match /inquiries/{inquiryId} {
       allow create: if true;
-      allow get, list: if isAdmin();
-      allow update, delete: if isExistingAdmin();
+      allow get, list, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Educational and promotional blog content.
-     * @path /blogPosts/{blogPostId}
-     * @allow (get, list) Anyone, including guest users.
-     * @allow (create, update, delete) Only authorized administrators.
-     * @principle Public content distribution with administrative control.
-     */
     match /blogPosts/{blogPostId} {
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Definitions of services offered by the enterprise.
-     * @path /services/{serviceId}
-     * @allow (get, list) Anyone, including guest users.
-     * @allow (create, update, delete) Only authorized administrators.
-     * @principle Standardizes service information across the site via admin control.
-     */
     match /services/{serviceId} {
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Static content for main site pages (Home, About, etc.).
-     * @path /pageContents/{pageContentId}
-     * @allow (get, list) Anyone, including guest users.
-     * @allow (create, update, delete) Only authorized administrators.
-     * @principle Enables CMS-like functionality for static pages via admin overrides.
-     */
     match /pageContents/{pageContentId} {
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
-
   }
 }

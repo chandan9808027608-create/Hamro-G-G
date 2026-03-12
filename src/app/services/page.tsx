@@ -1,8 +1,8 @@
-
 import { Wrench, ShieldCheck, RefreshCw, FileText, BadgeCheck, Phone, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { CONTACT_INFO } from '@/lib/constants';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ServicesPage() {
   const services = [
@@ -80,9 +80,27 @@ export default function ServicesPage() {
           <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-bold h-14 px-8 rounded-2xl text-lg shadow-xl" asChild>
             <Link href="/book-service">Book Appointment Online</Link>
           </Button>
-          <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary font-bold h-14 px-8 rounded-2xl text-lg" asChild>
-            <a href={`tel:${CONTACT_INFO.phone}`}>Call: {CONTACT_INFO.phone}</a>
-          </Button>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="text-white border-white hover:bg-white hover:text-primary font-bold h-14 px-8 rounded-2xl text-lg group" 
+                  asChild
+                >
+                  <a href={`tel:${CONTACT_INFO.phone}`} className="flex items-center gap-2">
+                    <Phone className="w-5 h-5 group-hover:animate-pulse" />
+                    <span>Call: {CONTACT_INFO.phone}</span>
+                  </a>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-white text-primary font-bold border-primary">
+                <p>Click to call: {CONTACT_INFO.phone}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </div>
