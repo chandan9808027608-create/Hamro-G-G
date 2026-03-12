@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Lock, Loader2, ShieldCheck, UserCog } from 'lucide-react';
+import { Lock, Loader2, ShieldCheck, UserCog, Info } from 'lucide-react';
 import { useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -146,7 +146,7 @@ export default function LoginPage() {
                     <FormControl>
                       <Input 
                         placeholder="Enter email" 
-                        autoComplete="email"
+                        autoComplete="off"
                         className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" 
                         {...field} 
                       />
@@ -165,8 +165,8 @@ export default function LoginPage() {
                     <FormControl>
                       <Input 
                         type="password" 
-                        placeholder="••••••••" 
-                        autoComplete="current-password"
+                        placeholder="Any 6+ chars" 
+                        autoComplete="off"
                         className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" 
                         {...field} 
                       />
@@ -186,6 +186,13 @@ export default function LoginPage() {
                   "Unlock Dashboard"
                 )}
               </Button>
+
+              <div className="bg-blue-50 border border-blue-100 p-3 rounded-xl flex gap-3 items-start">
+                <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                <p className="text-[10px] text-blue-700 leading-tight">
+                  <strong>PROTOTYPE MODE:</strong> Use any valid email and any 6-character key (e.g., <code>admin123</code>) to set up your account.
+                </p>
+              </div>
             </form>
           </Form>
         </CardContent>
