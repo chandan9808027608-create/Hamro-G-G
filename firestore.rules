@@ -25,35 +25,33 @@ service cloud.firestore {
       // Only admins can list all admin roles
       allow list: if isAdmin();
       // Allow any signed-in user to write (create/update) their own admin role document.
-      // This supports the prototype's self-service bootstrap process.
-      allow create, update: if isSignedIn() && request.auth.uid == userId;
-      // Deletion is restricted to existing admins to prevent accidental lockout
-      allow delete: if isAdmin();
+      // We use 'write' to cover all mutation types for the bootstrap process.
+      allow write: if isSignedIn() && request.auth.uid == userId;
     }
 
     match /vehicles/{vehicleId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /inquiries/{inquiryId} {
       allow create: if true;
-      allow get, list, update, delete: if isAdmin();
+      allow read, update, delete: if isAdmin();
     }
 
     match /blogPosts/{blogPostId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /services/{serviceId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /pageContents/{pageContentId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
