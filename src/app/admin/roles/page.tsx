@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -56,18 +55,17 @@ export default function RolesPage() {
     if (!db || !newEmail) return;
     setIsSubmitting(true);
     
-    // Using a sanitized version of the email or a random ID
-    // For this prototype, we'll use a random ID to allow the login logic to find it by email field
+    // Create an invitation based on the email
     const newStaffRef = doc(collection(db, 'roles_admin'));
     
     setDocumentNonBlocking(newStaffRef, {
       email: newEmail.toLowerCase(),
       role: newRole,
       createdAt: new Date().toISOString(),
-      status: 'invited' // Mark as invited so login can link it
+      status: 'invited' 
     }, { merge: true });
 
-    toast({ title: "Staff Added", description: `${newEmail} has been pre-authorized as ${newRole}.` });
+    toast({ title: "Staff Authorized", description: `${newEmail} has been pre-authorized as ${newRole}.` });
     setNewEmail('');
     setIsAddOpen(false);
     setIsSubmitting(false);
@@ -86,14 +84,14 @@ export default function RolesPage() {
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-full gap-2 px-6">
-              <UserPlus className="w-4 h-4" /> Add Staff Member
+              <UserPlus className="w-4 h-4" /> Pre-Authorize Staff
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] rounded-[2rem]">
             <DialogHeader>
-              <DialogTitle>Add New Staff</DialogTitle>
+              <DialogTitle>Pre-Authorize New Staff</DialogTitle>
               <DialogDescription>
-                Enter the staff member's email to pre-authorize their access.
+                Provide an email address to grant pre-approved access to the dashboard.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
@@ -101,7 +99,8 @@ export default function RolesPage() {
                 <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest ml-1">Email Address</Label>
                 <Input 
                   id="email" 
-                  placeholder="staff@ggauto.com" 
+                  placeholder="Enter staff email" 
+                  autoComplete="off"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   className="rounded-xl h-12"
@@ -126,7 +125,7 @@ export default function RolesPage() {
                 disabled={isSubmitting || !newEmail}
                 className="w-full h-12 rounded-xl font-bold"
               >
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Authorize Staff"}
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Authorize Staff Member"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -159,7 +158,7 @@ export default function RolesPage() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold">{r.id === user?.uid ? "You (Current Session)" : "Staff Member"}</span>
-                        {r.status === 'invited' && <span className="text-[10px] text-orange-600 font-bold uppercase">Pending Login</span>}
+                        {r.status === 'invited' && <span className="text-[10px] text-orange-600 font-bold uppercase">Pending Initial Login</span>}
                       </div>
                     </div>
                   </TableCell>
@@ -208,8 +207,8 @@ export default function RolesPage() {
       <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-2xl flex items-start gap-4 shadow-sm">
         <AlertTriangle className="w-6 h-6 text-yellow-600 shrink-0" />
         <div className="text-sm text-yellow-800">
-          <p className="font-bold mb-1 uppercase tracking-tight">Security Protocol</p>
-          <p>Super Admins have full control over site settings, roles, and data. Adding a new staff member by email allows them to claim that role the next time they log in.</p>
+          <p className="font-bold mb-1 uppercase tracking-tight">Access Control</p>
+          <p>Adding a staff member by email allows them to be automatically granted that role when they log in. Super Admins can manage all branding, roles, and showroom settings.</p>
         </div>
       </div>
     </div>

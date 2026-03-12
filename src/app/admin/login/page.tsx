@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -18,8 +17,8 @@ import { signInAnonymously } from 'firebase/auth';
 import { doc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Secret key must be at least 6 characters"),
   role: z.enum(['admin', 'super_admin']),
 });
 
@@ -44,7 +43,7 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      // 1. Sign in anonymously
+      // 1. Sign in anonymously to establish a session
       const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
 
@@ -55,12 +54,10 @@ export default function LoginPage() {
         const querySnapshot = await getDocs(q);
         
         let finalRole = values.role;
-        let invitationDocId = null;
 
         if (!querySnapshot.empty) {
           const invitation = querySnapshot.docs[0];
           finalRole = invitation.data().role;
-          invitationDocId = invitation.id;
           
           toast({ 
             title: "Authorized Access", 
@@ -69,7 +66,6 @@ export default function LoginPage() {
         }
 
         // 3. Link the session UID to the role
-        // We use the UID as the document ID for efficient lookups in providers
         const adminDocRef = doc(db, 'roles_admin', user.uid);
         
         setDocumentNonBlocking(adminDocRef, {
@@ -79,9 +75,6 @@ export default function LoginPage() {
           lastLogin: new Date().toISOString()
         }, { merge: true });
 
-        // 4. Cleanup the invitation document if it was separate from the UID
-        // In a real app we'd link them, here we'll just ensure the UID doc is the primary one
-        
         toast({ 
           title: "Dashboard Unlocked", 
           description: `Logged in as ${finalRole === 'super_admin' ? 'Super Admin' : 'Staff Admin'}.` 
@@ -151,7 +144,12 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="staff@ggauto.com" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" {...field} />
+                      <Input 
+                        placeholder="Enter email" 
+                        autoComplete="email"
+                        className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -165,7 +163,13 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Secret Key</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        autoComplete="current-password"
+                        className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
