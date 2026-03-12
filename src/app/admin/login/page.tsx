@@ -27,6 +27,14 @@ export default function LoginPage() {
   const auth = useAuth();
   const db = useFirestore();
 
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setLoading(true);
     
@@ -91,7 +99,7 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full bg-primary h-12 text-lg font-bold" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin mr-2" /> : "Sign In"}
+                {loading && <Loader2 className="animate-spin mr-2" />}
                 {loading ? "Authenticating..." : "Sign In"}
               </Button>
             </form>
@@ -100,9 +108,4 @@ export default function LoginPage() {
       </Card>
     </div>
   );
-}
-
-// Initializing the form outside to keep standard structure
-const form = {
-  // dummy object to avoid TS errors in the block above before it's processed
 }
