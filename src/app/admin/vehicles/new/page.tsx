@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -15,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Sparkles, Save, ChevronLeft, Loader2, Image as ImageIcon } from 'lucide-react';
 import { generateVehicleDescription } from '@/ai/flows/generate-vehicle-description';
 import { useFirestore, addDocumentNonBlocking } from '@/firebase';
-import { collection, serverTimestamp } from 'firebase/firestore';
+import { collection } from 'firebase/firestore';
 
 const formSchema = z.object({
   title: z.string().min(5),
@@ -46,7 +45,11 @@ export default function AddVehiclePage() {
   async function handleGenerateAI() {
     const values = form.getValues();
     if (!values.brand || !values.model) {
-      toast({ variant: "destructive", title: "Missing Info", description: "Please enter brand and model first." });
+      toast({ 
+        variant: "destructive", 
+        title: "Missing Info", 
+        description: "Please enter at least the brand and model to generate a description." 
+      });
       return;
     }
 
@@ -61,10 +64,19 @@ export default function AddVehiclePage() {
         condition: values.condition,
         price: values.price
       });
-      form.setValue('description', result.description);
-      toast({ title: "Description Generated", description: "AI has created a detailed listing for you." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "AI Error", description: "Failed to generate description." });
+      
+      if (result && result.description) {
+        form.setValue('description', result.description);
+        toast({ title: "Success", description: "AI description generated successfully!" });
+      } else {
+        throw new Error("Invalid AI response");
+      }
+    } catch (err: any) {
+      toast({ 
+        variant: "destructive", 
+        title: "AI Generation Failed", 
+        description: err.message || "Something went wrong while generating the description." 
+      });
     } finally {
       setGenerating(false);
     }
@@ -96,7 +108,7 @@ export default function AddVehiclePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={() => router.back()}><ChevronLeft className="w-4 h-4" /> Back</Button>
         <h1 className="text-3xl font-bold font-headline">Add New Vehicle</h1>
@@ -104,15 +116,15 @@ export default function AddVehiclePage() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border space-y-6">
+          <div className="bg-white p-8 rounded-[2rem] shadow-xl border space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem className="col-span-full">
-                    <FormLabel>Listing Title</FormLabel>
-                    <FormControl><Input placeholder="e.g. Pristine Honda Dio BS6 2022" {...field} /></FormControl>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Listing Title</FormLabel>
+                    <FormControl><Input placeholder="e.g. Pristine Honda Dio BS6 2022" className="h-12 rounded-xl shadow-sm" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -122,16 +134,16 @@ export default function AddVehiclePage() {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem className="col-span-full">
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Image URL</FormLabel>
                     <FormControl>
                       <div className="flex gap-2">
-                        <Input placeholder="https://images.unsplash.com/..." {...field} />
-                        <div className="w-10 h-10 border rounded flex items-center justify-center shrink-0">
+                        <Input placeholder="https://images.unsplash.com/..." className="h-12 rounded-xl shadow-sm" {...field} />
+                        <div className="w-12 h-12 border rounded-xl flex items-center justify-center shrink-0 bg-gray-50">
                           <ImageIcon className="text-muted-foreground w-5 h-5" />
                         </div>
                       </div>
                     </FormControl>
-                    <FormDescription>Link to an image of the vehicle (Unsplash or similar).</FormDescription>
+                    <FormDescription>Link to an image of the vehicle.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -141,8 +153,8 @@ export default function AddVehiclePage() {
                 name="brand"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brand</FormLabel>
-                    <FormControl><Input placeholder="Yamaha" {...field} /></FormControl>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Brand</FormLabel>
+                    <FormControl><Input placeholder="Yamaha" className="h-12 rounded-xl shadow-sm" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -152,8 +164,8 @@ export default function AddVehiclePage() {
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Model</FormLabel>
-                    <FormControl><Input placeholder="MT-15" {...field} /></FormControl>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Model</FormLabel>
+                    <FormControl><Input placeholder="MT-15" className="h-12 rounded-xl shadow-sm" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -163,10 +175,10 @@ export default function AddVehiclePage() {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Type</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                        <SelectTrigger className="h-12 rounded-xl shadow-sm"><SelectValue placeholder="Select type" /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="bike">Bike</SelectItem>
@@ -182,10 +194,10 @@ export default function AddVehiclePage() {
                 name="condition"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Condition</FormLabel>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Condition</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select condition" /></SelectTrigger>
+                        <SelectTrigger className="h-12 rounded-xl shadow-sm"><SelectValue placeholder="Select condition" /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Excellent">Excellent</SelectItem>
@@ -203,8 +215,8 @@ export default function AddVehiclePage() {
                 name="year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Year</FormLabel>
-                    <FormControl><Input type="number" {...field} /></FormControl>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Year</FormLabel>
+                    <FormControl><Input type="number" className="h-12 rounded-xl shadow-sm" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -214,8 +226,8 @@ export default function AddVehiclePage() {
                 name="kmRun"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>KM Run</FormLabel>
-                    <FormControl><Input type="number" {...field} /></FormControl>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">KM Run</FormLabel>
+                    <FormControl><Input type="number" className="h-12 rounded-xl shadow-sm" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -225,8 +237,8 @@ export default function AddVehiclePage() {
                 name="price"
                 render={({ field }) => (
                   <FormItem className="col-span-full">
-                    <FormLabel>Price (NPR)</FormLabel>
-                    <FormControl><Input type="number" {...field} /></FormControl>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Price (NPR)</FormLabel>
+                    <FormControl><Input type="number" className="h-12 rounded-xl shadow-sm" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -234,17 +246,17 @@ export default function AddVehiclePage() {
 
               <div className="col-span-full space-y-4 pt-4">
                 <div className="flex justify-between items-center">
-                  <FormLabel>Vehicle Description</FormLabel>
+                  <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Vehicle Description</FormLabel>
                   <Button 
                     type="button" 
                     variant="outline" 
                     size="sm" 
-                    className="gap-2 text-primary border-primary"
+                    className="gap-2 text-primary border-primary hover:bg-primary/5 rounded-full px-4"
                     onClick={handleGenerateAI}
                     disabled={generating}
                   >
                     {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    Generate AI Description
+                    {generating ? "AI Working..." : "Generate AI Description"}
                   </Button>
                 </div>
                 <FormField
@@ -252,9 +264,9 @@ export default function AddVehiclePage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl><Textarea className="min-h-[200px]" {...field} /></FormControl>
+                      <FormControl><Textarea className="min-h-[200px] rounded-2xl shadow-sm" placeholder="Tell us more about this vehicle..." {...field} /></FormControl>
                       <FormMessage />
-                      <FormDescription>Craft a persuasive description highlighting features and maintenance history.</FormDescription>
+                      <FormDescription>Craft a persuasive description or use our AI assistant.</FormDescription>
                     </FormItem>
                   )}
                 />
@@ -262,7 +274,7 @@ export default function AddVehiclePage() {
             </div>
 
             <div className="pt-6 border-t">
-              <Button type="submit" className="w-full bg-primary h-12 text-lg font-bold gap-2">
+              <Button type="submit" className="w-full h-14 bg-primary text-xl font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-transform flex items-center justify-center gap-3">
                 <Save className="w-5 h-5" /> Save Vehicle to Inventory
               </Button>
             </div>

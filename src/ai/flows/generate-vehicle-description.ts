@@ -3,71 +3,61 @@
  * @fileOverview An AI assistant flow for generating detailed vehicle descriptions.
  *
  * - generateVehicleDescription - A function that handles the vehicle description generation process.
- * - GenerateVehicleDescriptionInput - The input type for the generateVehicleDescription function.
- * - GenerateVehicleDescriptionOutput - The return type for the generateVehicleDescription function.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const GenerateVehicleDescriptionInputSchema = z.object({
-  brand: z.string().describe('The brand of the two-wheeler.'),
-  model: z.string().describe('The model of the two-wheeler.'),
-  type: z.enum(['bike', 'scooter']).describe('The type of the two-wheeler (bike or scooter).'),
-  year: z.number().describe('The manufacturing year of the two-wheeler.'),
-  kmRun: z.number().describe('The total kilometers the two-wheeler has run.'),
-  condition: z.string().describe('The overall condition of the two-wheeler (e.g., excellent, good, fair).'),
-  price: z.number().describe('The price of the two-wheeler in NPR.'),
-});
-export type GenerateVehicleDescriptionInput = z.infer<typeof GenerateVehicleDescriptionInputSchema>;
-
 const GenerateVehicleDescriptionOutputSchema = z.object({
   description: z.string().describe('A comprehensive and engaging description for the vehicle listing.'),
 });
-export type GenerateVehicleDescriptionOutput = z.infer<typeof GenerateVehicleDescriptionOutputSchema>;
 
-export async function generateVehicleDescription(input: GenerateVehicleDescriptionInput): Promise<GenerateVehicleDescriptionOutput> {
-  return generateVehicleDescriptionFlow(input);
-}
+/**
+ * Generates a detailed vehicle description using AI.
+ * This is a Server Action.
+ */
+export async function generateVehicleDescription(input: {
+  brand: string;
+  model: string;
+  type: 'bike' | 'scooter';
+  year: number;
+  kmRun: number;
+  condition: string;
+  price: number;
+}) {
+  try {
+    const { output } = await ai.generate({
+      model: 'googleai/gemini-1.5-flash',
+      output: { schema: GenerateVehicleDescriptionOutputSchema },
+      prompt: `You are an expert automotive salesperson specializing in second-hand two-wheelers in Kathmandu, Nepal. 
+      Your task is to generate a compelling, professional, and detailed sales description for a ${input.brand} ${input.model} ${input.type}.
 
-const prompt = ai.definePrompt({
-  name: 'generateVehicleDescriptionPrompt',
-  input: { schema: GenerateVehicleDescriptionInputSchema },
-  output: { schema: GenerateVehicleDescriptionOutputSchema },
-  prompt: `You are an expert automotive salesperson specializing in second-hand two-wheelers. Your task is to generate a compelling and detailed sales description for a {{type}}.
+      Vehicle Specifications:
+      - Brand: ${input.brand}
+      - Model: ${input.model}
+      - Type: ${input.type}
+      - Year: ${input.year}
+      - Kilometers Run: ${input.kmRun} km
+      - Condition: ${input.condition}
+      - Price: NPR ${input.price.toLocaleString()}
 
-Use the following specifications to craft an enticing description that highlights key features, condition, and value for potential buyers, suitable for an online listing. Keep the tone persuasive and informative.
+      Craft a detailed description that covers:
+      1. An engaging opening highlighting the model's popularity or reliability.
+      2. Key features and performance advantages (e.g., fuel efficiency, ease of handling).
+      3. Elaborate on the ${input.condition} condition, mentioning it's been inspected.
+      4. Mention that the low mileage (${input.kmRun} km) makes it a great value.
+      5. A strong call to action inviting them to visit Hamro G&G Auto Enterprises at Nayabasti, Boudha for a test ride.
 
-Vehicle Specifications:
-- Brand: {{{brand}}}
-- Model: {{{model}}}
-- Type: {{{type}}}
-- Year: {{{year}}}
-- Kilometers Run: {{{kmRun}}} km
-- Condition: {{{condition}}}
-- Price: NPR {{{price}}}
+      The description should be professional, enticing, and at least 150 words long.`,
+    });
 
-Craft a detailed description that covers:
-1.  An engaging opening highlighting the model.
-2.  Key features and advantages based on its type and model.
-3.  Elaborate on the condition, ensuring trustworthiness.
-4.  Mention the kilometers run and how it relates to its value.
-5.  A strong call to action to contact the dealership.
-
-The description should be at least 150 words.`,
-});
-
-const generateVehicleDescriptionFlow = ai.defineFlow(
-  {
-    name: 'generateVehicleDescriptionFlow',
-    inputSchema: GenerateVehicleDescriptionInputSchema,
-    outputSchema: GenerateVehicleDescriptionOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
     if (!output) {
       throw new Error('AI failed to generate a response.');
     }
+
     return output;
+  } catch (error) {
+    console.error('Genkit Error:', error);
+    throw new Error('Failed to generate description. Please check your connection and try again.');
   }
-);
+}
