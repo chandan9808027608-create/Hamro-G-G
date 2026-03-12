@@ -1,11 +1,10 @@
-
 "use client"
 
 import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2, CheckCircle, ExternalLink, MessageSquare, Loader2, LayoutDashboard } from 'lucide-react';
+import { Plus, Pencil, Trash2, CheckCircle, ExternalLink, MessageSquare, Loader2, LayoutDashboard, Bike } from 'lucide-react';
 import Link from 'next/link';
 import { useFirestore, useCollection, useMemoFirebase, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
