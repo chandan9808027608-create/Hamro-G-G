@@ -10,6 +10,8 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
+export const maxDuration = 60; // Increase timeout for slow AI generation
+
 const GenerateVehicleDescriptionInputSchema = z.object({
   brand: z.string().describe('The brand of the two-wheeler.'),
   model: z.string().describe('The model of the two-wheeler.'),
@@ -65,6 +67,9 @@ const generateVehicleDescriptionFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('AI failed to generate a response.');
+    }
+    return output;
   }
 );
