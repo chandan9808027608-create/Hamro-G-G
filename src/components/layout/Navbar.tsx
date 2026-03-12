@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Wrench, Bike, ShieldCheck, Settings, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
