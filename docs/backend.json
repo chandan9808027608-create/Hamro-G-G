@@ -16,285 +16,115 @@
         },
         "brand": {
           "type": "string",
-          "description": "The manufacturer's brand of the vehicle (e.g., Honda, Bajaj)."
+          "description": "The manufacturer's brand of the vehicle."
         },
         "model": {
           "type": "string",
-          "description": "The specific model of the vehicle (e.g., Pulsar 150, Dio)."
+          "description": "The specific model of the vehicle."
         },
         "type": {
           "type": "string",
-          "description": "The category of the vehicle (e.g., 'bike', 'scooter')."
+          "description": "The category of the vehicle ('bike', 'scooter')."
         },
         "year": {
           "type": "number",
-          "description": "The manufacturing year of the vehicle."
+          "description": "The manufacturing year."
         },
-        "kmRun": {
+        "km_run": {
           "type": "number",
-          "description": "The total kilometers the vehicle has run."
+          "description": "Total kilometers run."
         },
         "price": {
           "type": "number",
-          "description": "The selling price of the vehicle in NPR."
+          "description": "Selling price in NPR."
         },
         "description": {
           "type": "string",
-          "description": "A detailed description of the vehicle, including features and condition."
+          "description": "Detailed description."
         },
-        "imageUrls": {
+        "image_urls": {
           "type": "array",
-          "description": "An array of URLs pointing to high-resolution images of the vehicle.",
+          "description": "URLs to images.",
           "items": {
             "type": "string"
           }
         },
         "condition": {
           "type": "string",
-          "description": "The overall condition of the vehicle (e.g., 'Excellent', 'Good', 'Fair', 'New')."
+          "description": "Overall condition."
         },
         "status": {
           "type": "string",
-          "description": "The current availability status of the vehicle (e.g., 'available', 'sold', 'pending')."
+          "description": "Availability status ('available', 'sold')."
         },
-        "createdAt": {
+        "created_at": {
           "type": "string",
-          "description": "Timestamp indicating when the vehicle listing was first created.",
           "format": "date-time"
         },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the vehicle listing was last updated.",
-          "format": "date-time"
-        },
-        "isFeatured": {
-          "type": "boolean",
-          "description": "Indicates if the vehicle should be highlighted in a 'Featured' section on the homepage or inventory."
+        "featured": {
+          "type": "boolean"
         }
       },
       "required": [
-        "id",
         "title",
         "brand",
         "model",
         "type",
         "year",
-        "kmRun",
+        "km_run",
         "price",
-        "description",
-        "imageUrls",
-        "condition",
         "status",
-        "createdAt"
+        "created_at"
       ]
     },
     "Inquiry": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Inquiry",
       "type": "object",
-      "description": "Stores lead generation submissions from various forms on the website (Sell Your Bike, Exchange, Test Ride, Contact Us).",
+      "description": "Stores lead generation submissions.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the Inquiry entity."
+          "type": "string"
         },
         "type": {
-          "type": "string",
-          "description": "The type of inquiry submitted (e.g., 'Sell Your Bike', 'Exchange Inquiry', 'Test Ride Booking', 'General Contact')."
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "The full name of the person making the inquiry."
-        },
-        "email": {
-          "type": "string",
-          "description": "The email address of the inquirer.",
-          "format": "email"
+          "type": "string"
         },
         "phone": {
-          "type": "string",
-          "description": "The contact phone number of the inquirer."
+          "type": "string"
         },
         "message": {
+          "type": "string"
+        },
+        "created_at": {
           "type": "string",
-          "description": "The main message or details provided by the inquirer."
-        },
-        "inquiredVehicleId": {
-          "type": "string",
-          "description": "Reference to the Vehicle if the inquiry is related to a specific vehicle (e.g., Test Ride, specific question). (Relationship: Vehicle 1:N Inquiry)"
-        },
-        "sellExchangeVehicleBrand": {
-          "type": "string",
-          "description": "Brand of the vehicle the user wants to sell or exchange (specific to 'Sell Your Bike' and 'Exchange Inquiry' types)."
-        },
-        "sellExchangeVehicleModel": {
-          "type": "string",
-          "description": "Model of the vehicle the user wants to sell or exchange (specific to 'Sell Your Bike' and 'Exchange Inquiry' types)."
-        },
-        "sellExchangeVehicleYear": {
-          "type": "number",
-          "description": "Manufacturing year of the vehicle the user wants to sell or exchange (specific to 'Sell Your Bike' and 'Exchange Inquiry' types)."
-        },
-        "sellExchangeVehicleKmRun": {
-          "type": "number",
-          "description": "Kilometers run by the vehicle the user wants to sell or exchange (specific to 'Sell Your Bike' and 'Exchange Inquiry' types)."
-        },
-        "preferredTestRideDateTime": {
-          "type": "string",
-          "description": "The preferred date and time for a test ride, if the inquiry type is 'Test Ride Booking'.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the inquiry was submitted.",
           "format": "date-time"
         },
         "status": {
-          "type": "string",
-          "description": "The processing status of the inquiry (e.g., 'New', 'Contacted', 'Resolved', 'Archived')."
+          "type": "string"
         }
       },
       "required": [
-        "id",
         "type",
         "name",
         "phone",
         "message",
-        "createdAt",
+        "created_at",
         "status"
       ]
     },
-    "BlogPost": {
+    "AdminRole": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "BlogPost",
+      "title": "AdminRole",
       "type": "object",
-      "description": "Represents a blog post published on the website to share news, tips, or industry insights.",
+      "description": "Defines an administrative user role.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Blog Post entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the blog post."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly version of the title, used for SEO and permalinks."
-        },
-        "content": {
-          "type": "string",
-          "description": "The full content of the blog post, possibly in rich text or markdown format."
-        },
-        "authorName": {
-          "type": "string",
-          "description": "The name of the author of the blog post."
-        },
-        "publishedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the blog post was published.",
-          "format": "date-time"
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL to the main image associated with the blog post.",
-          "format": "uri"
-        },
-        "metaTitle": {
-          "type": "string",
-          "description": "SEO meta title for the blog post."
-        },
-        "metaDescription": {
-          "type": "string",
-          "description": "SEO meta description for the blog post."
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "slug",
-        "content",
-        "authorName",
-        "publishedAt"
-      ]
-    },
-    "Service": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Service",
-      "type": "object",
-      "description": "Defines the various services offered by Hamro G & G Auto Enterprises.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Service entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The name of the service (e.g., 'Buy Bikes', 'Sell Scooters', 'Exchange Program', 'Repair & Servicing')."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the service offered."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL to an illustrative image for the service.",
-          "format": "uri"
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly version of the service title, used for permalinks."
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "description",
-        "slug"
-      ]
-    },
-    "PageContent": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "PageContent",
-      "type": "object",
-      "description": "Manages static content for various pages of the website, enabling easy updates via an admin panel.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the page content, often a slug (e.g., 'home', 'about-us', 'contact-us')."
-        },
-        "pageName": {
-          "type": "string",
-          "description": "The user-friendly name of the page (e.g., 'Home Page', 'About Us')."
-        },
-        "mainContent": {
-          "type": "string",
-          "description": "The primary content of the page, can be rich text or HTML."
-        },
-        "heroImageUrl": {
-          "type": "string",
-          "description": "URL for the hero banner image specific to this page.",
-          "format": "uri"
-        },
-        "metaTitle": {
-          "type": "string",
-          "description": "SEO meta title for the page."
-        },
-        "metaDescription": {
-          "type": "string",
-          "description": "SEO meta description for the page."
-        },
-        "lastUpdatedAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the page content was last updated.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "pageName",
-        "mainContent"
-      ]
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -304,74 +134,17 @@
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/vehicles/{vehicleId}",
-        "definition": {
-          "entityName": "Vehicle",
-          "schema": {
-            "$ref": "#/backend/entities/Vehicle"
-          },
-          "description": "Stores details for each two-wheeler available for resale. Publicly readable, admin-manageable. Includes 'status' field for inventory management (available/sold)."
-        }
-      },
-      {
-        "path": "/inquiries/{inquiryId}",
-        "definition": {
-          "entityName": "Inquiry",
-          "schema": {
-            "$ref": "#/backend/entities/Inquiry"
-          },
-          "description": "Captures lead generation submissions from various forms (Sell Your Bike, Exchange, Test Ride, Contact Us). Allows public creation, but read/update/delete are restricted to administrators. Includes 'status' for tracking lead progression."
-        }
-      },
-      {
-        "path": "/blogPosts/{blogPostId}",
-        "definition": {
-          "entityName": "BlogPost",
-          "schema": {
-            "$ref": "#/backend/entities/BlogPost"
-          },
-          "description": "Houses content for the website's blog. Publicly readable, admin-manageable. Uses 'slug' for SEO-friendly URLs."
-        }
-      },
-      {
-        "path": "/services/{serviceId}",
-        "definition": {
-          "entityName": "Service",
-          "schema": {
-            "$ref": "#/backend/entities/Service"
-          },
-          "description": "Defines the various services offered by the business (e.g., Buy, Sell, Exchange, Repair). Publicly readable, admin-manageable. Uses 'slug' for SEO-friendly URLs."
-        }
-      },
-      {
-        "path": "/pageContents/{pageContentId}",
-        "definition": {
-          "entityName": "PageContent",
-          "schema": {
-            "$ref": "#/backend/entities/PageContent"
-          },
-          "description": "Manages static content for website pages (e.g., Home, About Us). Publicly readable, admin-manageable. 'id' serves as a content slug (e.g., 'home', 'about-us')."
-        }
-      },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "admin",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Dedicated collection for assigning administrator roles. The existence of a document at this path for a given 'userId' grants administrative privileges. This supports DBAC (Database Access Control) and enables atomic authorization checks without complex hierarchical lookups.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique Firebase Authentication UID of the user with administrator privileges."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The recommended Firestore structure prioritizes security, scalability, and debuggability by adhering strictly to the core design principles. Each primary entity (Vehicle, Inquiry, BlogPost, Service, PageContent) is established as a top-level collection, ensuring structural segregation and homogeneous security postures within each collection. This approach simplifies security rules significantly.\n\n**Authorization Independence:** This is critically achieved by several strategies:\n1.  **Global Roles via Existence**: Admin authorization is managed through a dedicated top-level collection, `/roles_admin/{userId}`. To check if a user is an admin, security rules will simply verify `exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))`. This completely avoids expensive and transaction-breaking `get()` calls to parent documents or other data within security rules, making authorization atomic and highly performable.\n2.  **Flat Structure for Public/Admin Content**: For entities like `vehicles`, `blogPosts`, `services`, and `pageContents`, there are no hierarchical authorization dependencies. Documents within these collections are either publicly readable or managed by an admin. The access decision is made directly on the document based on the request type and the user's admin role, not on inherited properties from a parent.\n\n**QAPs (Rules are not Filters) Support:** The design inherently supports Query-Aware Permissions:\n1.  **Publicly Accessible Collections**: Collections like `/vehicles`, `/blogPosts`, `/services`, and `/pageContents` are designed for public read access. Any `list` query on these collections will retrieve only data intended for public consumption. Security rules will simply permit `read` for all users on these paths, ensuring that `list` operations do not require server-side filtering by security rules.\n2.  **Admin-Only Collections/Operations**: The `/inquiries` collection, while allowing public `create` operations, restricts `list`, `get`, `update`, and `delete` to administrators. The admin role check (via `/roles_admin`) is a simple `exists()` check, guaranteeing that `list` operations for inquiries will only return data to authorized admins, without exposing sensitive lead data to unauthorized users.\n\nThis structure minimizes complexity by pushing security logic into the structure itself, resulting in simpler, more robust, and easily debuggable Firestore security rules."
+    "/vehicles/{vehicleId}": {
+      "schema": { "$ref": "#/backend/entities/Vehicle" },
+      "description": "Vehicle inventory."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/backend/entities/Inquiry" },
+      "description": "Customer leads."
+    },
+    "/roles_admin/{userId}": {
+      "schema": { "$ref": "#/backend/entities/AdminRole" },
+      "description": "Admin authorization mapping."
+    }
   }
 }
