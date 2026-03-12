@@ -122,7 +122,7 @@
       "description": "Defines an administrative user role.",
       "properties": {
         "email": { "type": "string" },
-        "role": { "type": "string", "enum": ["admin"] },
+        "role": { "type": "string", "enum": ["admin", "super_admin"] },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     }
