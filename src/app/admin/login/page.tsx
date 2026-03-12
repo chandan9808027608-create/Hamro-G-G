@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -14,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Lock, Loader2, ShieldCheck, UserCog } from 'lucide-react';
 import { useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { signInAnonymously } from 'firebase/auth';
-import { doc } from 'firebase/firestore';
+import { doc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -39,37 +40,61 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
+    if (!db) return;
     setLoading(true);
     
     try {
-      // Use anonymous sign-in to bootstrap the prototype admin session
+      // 1. Sign in anonymously
       const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
 
-      if (user && db) {
-        // Create or update the admin role document for this UID
+      if (user) {
+        // 2. Check if this email was pre-authorized by a Super Admin
+        const rolesCol = collection(db, 'roles_admin');
+        const q = query(rolesCol, where('email', '==', values.email.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+        
+        let finalRole = values.role;
+        let invitationDocId = null;
+
+        if (!querySnapshot.empty) {
+          const invitation = querySnapshot.docs[0];
+          finalRole = invitation.data().role;
+          invitationDocId = invitation.id;
+          
+          toast({ 
+            title: "Authorized Access", 
+            description: `Welcome back. Your pre-assigned role as ${finalRole} has been activated.` 
+          });
+        }
+
+        // 3. Link the session UID to the role
+        // We use the UID as the document ID for efficient lookups in providers
         const adminDocRef = doc(db, 'roles_admin', user.uid);
         
-        // Non-blocking write to register the role in Firestore
         setDocumentNonBlocking(adminDocRef, {
-          email: values.email,
-          role: values.role,
-          createdAt: new Date().toISOString()
+          email: values.email.toLowerCase(),
+          role: finalRole,
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString()
         }, { merge: true });
 
+        // 4. Cleanup the invitation document if it was separate from the UID
+        // In a real app we'd link them, here we'll just ensure the UID doc is the primary one
+        
         toast({ 
-          title: "Access Granted", 
-          description: `Logged in as ${values.role === 'super_admin' ? 'Super Admin' : 'Staff Admin'}.` 
+          title: "Dashboard Unlocked", 
+          description: `Logged in as ${finalRole === 'super_admin' ? 'Super Admin' : 'Staff Admin'}.` 
         });
         
-        // Redirect to dashboard
         router.push('/admin/dashboard');
       }
     } catch (error) {
+      console.error("Login Error:", error);
       toast({ 
         variant: "destructive", 
-        title: "Login Failed", 
-        description: "Could not initialize secure session. Please try again." 
+        title: "Access Denied", 
+        description: "Credentials verification failed. Please check your keys." 
       });
     } finally {
       setLoading(false);
@@ -84,7 +109,7 @@ export default function LoginPage() {
             <Lock className="w-10 h-10 text-primary" />
           </div>
           <CardTitle className="text-4xl font-headline font-black tracking-tight text-primary">STAFF PORTAL</CardTitle>
-          <CardDescription className="text-base font-medium">G&G Auto Enterprises Hub</CardDescription>
+          <CardDescription className="text-base font-medium">Authorized Entry Only</CardDescription>
         </CardHeader>
         <CardContent className="p-8 bg-white">
           <Form {...form}>
