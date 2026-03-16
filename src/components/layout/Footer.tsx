@@ -1,8 +1,7 @@
-
 "use client"
 
 import Link from 'next/link';
-import { Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, MessageCircle } from 'lucide-react';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -21,6 +20,8 @@ export function Footer() {
   const contactPhone = settings?.contact_phone || "9860087161";
   const contactEmail = settings?.contact_email || "info@ggautonp.com";
   const address = settings?.address || "Nayabasti, Boudha (Everest Petrol Pump)";
+
+  const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}`;
 
   return (
     <footer className="bg-primary text-white pt-12 pb-8 border-t border-white/10">
@@ -46,7 +47,15 @@ export function Footer() {
           </p>
           <div className="flex gap-4">
             <Link href="#" className="hover:text-secondary transition-colors"><Facebook className="w-5 h-5" /></Link>
-            <Link href="#" className="hover:text-secondary transition-colors"><Instagram className="w-5 h-5" /></Link>
+            <a 
+              href={whatsappUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-secondary transition-colors"
+              title="Chat on WhatsApp"
+            >
+              <MessageCircle className="w-5 h-5" />
+            </a>
           </div>
         </div>
 
