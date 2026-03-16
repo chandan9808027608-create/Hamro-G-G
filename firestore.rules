@@ -16,8 +16,11 @@ service cloud.firestore {
     }
 
     match /roles_admin/{userId} {
+      // Allow individual read, and Super Admin can read all
       allow read: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
-      allow list: if isAdmin();
+      // Allow any signed-in user to query for invitations (e.g., checking their own email)
+      allow list: if isSignedIn();
+      // Allow individual write (registration) and Super Admin management
       allow write: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin());
     }
 

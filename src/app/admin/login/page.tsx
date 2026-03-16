@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -41,6 +42,17 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     if (!db) return;
     setLoading(true);
+    
+    // Explicit bootstrap check for Super Admin role
+    if (values.role === 'super_admin' && values.password !== 'ggauto2024') {
+      setLoading(false);
+      toast({ 
+        variant: "destructive", 
+        title: "Access Denied", 
+        description: "Invalid Secret Key for Super Admin access." 
+      });
+      return;
+    }
     
     try {
       // 1. Sign in anonymously to establish a session
@@ -165,7 +177,7 @@ export default function LoginPage() {
                     <FormControl>
                       <Input 
                         type="password" 
-                        placeholder="Any 6+ chars" 
+                        placeholder="Min 6 characters" 
                         autoComplete="off"
                         className="h-12 rounded-xl bg-gray-50 border-gray-200 focus:bg-white transition-colors" 
                         {...field} 
