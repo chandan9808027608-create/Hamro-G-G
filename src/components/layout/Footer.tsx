@@ -6,6 +6,7 @@ import { Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { CONTACT_INFO } from '@/lib/constants';
 
 export function Footer() {
   const db = useFirestore();
@@ -76,7 +77,14 @@ export function Footer() {
           <ul className="space-y-3 text-sm text-white/70">
             <li className="flex items-start gap-2">
               <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/60" />
-              <span>{address}</span>
+              <a 
+                href={CONTACT_INFO.mapsLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                {address}
+              </a>
             </li>
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 shrink-0 text-white/60" />

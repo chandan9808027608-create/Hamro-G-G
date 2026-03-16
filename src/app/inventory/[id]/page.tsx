@@ -147,7 +147,14 @@ export default function VehicleDetailPage() {
                 <MapPin className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-bold">Showroom Location</p>
-                  <p className="text-muted-foreground">{CONTACT_INFO.address}</p>
+                  <a 
+                    href={CONTACT_INFO.mapsLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {CONTACT_INFO.address}
+                  </a>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg text-green-700 text-sm font-medium">
