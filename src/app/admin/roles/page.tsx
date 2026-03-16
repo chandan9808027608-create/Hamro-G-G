@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -6,7 +7,7 @@ import { collection, doc } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, UserCog, Loader2, Users, AlertTriangle, UserPlus, Trash2 } from 'lucide-react';
+import { ShieldCheck, UserCog, Loader2, Users, AlertTriangle, UserPlus, Trash2, Pencil } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -17,9 +18,17 @@ export default function RolesPage() {
   const db = useFirestore();
   const { user } = useUser();
   const { toast } = useToast();
+  
+  // Add Staff State
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState<'admin' | 'super_admin'>('admin');
+  
+  // Edit Email State
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<any>(null);
+  const [editEmail, setEditEmail] = useState('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const rolesQuery = useMemoFirebase(() => {
@@ -55,7 +64,6 @@ export default function RolesPage() {
     if (!db || !newEmail) return;
     setIsSubmitting(true);
     
-    // Create an invitation based on the email
     const newStaffRef = doc(collection(db, 'roles_admin'));
     
     setDocumentNonBlocking(newStaffRef, {
@@ -65,9 +73,27 @@ export default function RolesPage() {
       status: 'invited' 
     }, { merge: true });
 
-    toast({ title: "Staff Authorized", description: `${newEmail} has been pre-authorized as ${newRole}.` });
+    toast({ title: "Staff Authorized", description: `${newEmail} has been pre-authorized.` });
     setNewEmail('');
     setIsAddOpen(false);
+    setIsSubmitting(false);
+  };
+
+  const openEditEmail = (staff: any) => {
+    setEditingStaff(staff);
+    setEditEmail(staff.email);
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateEmail = () => {
+    if (!db || !editingStaff || !editEmail) return;
+    setIsSubmitting(true);
+    
+    const docRef = doc(db, 'roles_admin', editingStaff.id);
+    updateDocumentNonBlocking(docRef, { email: editEmail.toLowerCase() });
+    
+    toast({ title: "Email Updated", description: "The staff email has been updated successfully." });
+    setIsEditOpen(false);
     setIsSubmitting(false);
   };
 
@@ -78,28 +104,28 @@ export default function RolesPage() {
           <h1 className="text-3xl font-bold font-headline flex items-center gap-3">
             <Users className="w-8 h-8 text-primary" /> Staff Management
           </h1>
-          <p className="text-muted-foreground">Manage administrative roles and access levels</p>
+          <p className="text-muted-foreground">Manage administrative emails and access levels</p>
         </div>
 
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
             <Button className="rounded-full gap-2 px-6">
-              <UserPlus className="w-4 h-4" /> Pre-Authorize Staff
+              <UserPlus className="w-4 h-4" /> Add New Individual
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] rounded-[2rem]">
             <DialogHeader>
-              <DialogTitle>Pre-Authorize New Staff</DialogTitle>
+              <DialogTitle>Authorize New Individual</DialogTitle>
               <DialogDescription>
-                Provide an email address to grant pre-approved access to the dashboard.
+                Grant pre-approved access to the dashboard using their Gmail/Email.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest ml-1">Email Address</Label>
+                <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest ml-1">Gmail / Email</Label>
                 <Input 
                   id="email" 
-                  placeholder="Enter staff email" 
+                  placeholder="e.g. user@gmail.com" 
                   autoComplete="off"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
@@ -107,7 +133,7 @@ export default function RolesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest ml-1">Assigned Role</Label>
+                <Label className="text-xs font-bold uppercase tracking-widest ml-1">Access Level</Label>
                 <Select value={newRole} onValueChange={(val: any) => setNewRole(val)}>
                   <SelectTrigger className="rounded-xl h-12">
                     <SelectValue placeholder="Select a role" />
@@ -125,25 +151,58 @@ export default function RolesPage() {
                 disabled={isSubmitting || !newEmail}
                 className="w-full h-12 rounded-xl font-bold"
               >
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Authorize Staff Member"}
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Authorize Individual"}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Edit Email Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-[2rem]">
+          <DialogHeader>
+            <DialogTitle>Edit Individual Email</DialogTitle>
+            <DialogDescription>
+              Update the login email for this staff member.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-email" className="text-xs font-bold uppercase tracking-widest ml-1">New Gmail / Email</Label>
+              <Input 
+                id="edit-email" 
+                placeholder="Enter new email" 
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                className="rounded-xl h-12"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={handleUpdateEmail} 
+              disabled={isSubmitting || !editEmail}
+              className="w-full h-12 rounded-xl font-bold"
+            >
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="bg-white rounded-[2rem] shadow-xl border overflow-hidden">
         {isLoading ? (
           <div className="p-20 flex flex-col items-center justify-center gap-4">
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
-            <p className="text-muted-foreground">Loading staff list...</p>
+            <p className="text-muted-foreground">Syncing staff list...</p>
           </div>
         ) : (
           <Table>
             <TableHeader className="bg-gray-50/50">
               <TableRow>
-                <TableHead className="py-5">Staff Member</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead className="py-5">Individual</TableHead>
+                <TableHead>Email Address</TableHead>
                 <TableHead>Current Role</TableHead>
                 <TableHead className="text-right px-8">Actions</TableHead>
               </TableRow>
@@ -157,12 +216,19 @@ export default function RolesPage() {
                         {r.role === 'super_admin' ? <ShieldCheck className="w-5 h-5 text-primary" /> : <UserCog className="w-5 h-5 text-muted-foreground" />}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold">{r.id === user?.uid ? "You (Current Session)" : "Staff Member"}</span>
-                        {r.status === 'invited' && <span className="text-[10px] text-orange-600 font-bold uppercase">Pending Initial Login</span>}
+                        <span className="font-bold">{r.id === user?.uid ? "Your Account" : "Staff User"}</span>
+                        {r.status === 'invited' && <span className="text-[10px] text-orange-600 font-bold uppercase">Awaiting Login</span>}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm font-medium">{r.email}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{r.email}</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={() => openEditEmail(r)}>
+                        <Pencil className="w-3 h-3 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge className={r.role === 'super_admin' ? 'bg-primary text-white px-3 py-1' : 'bg-gray-100 text-gray-700 px-3 py-1'}>
                       {r.role.toUpperCase().replace('_', ' ')}
@@ -176,7 +242,7 @@ export default function RolesPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="super_admin">Super</SelectItem>
+                          <SelectItem value="super_admin">Super Admin</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button 
@@ -195,7 +261,7 @@ export default function RolesPage() {
               {roles?.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="h-40 text-center text-muted-foreground">
-                    No staff members found.
+                    No individuals found.
                   </TableCell>
                 </TableRow>
               )}
@@ -207,8 +273,8 @@ export default function RolesPage() {
       <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-2xl flex items-start gap-4 shadow-sm">
         <AlertTriangle className="w-6 h-6 text-yellow-600 shrink-0" />
         <div className="text-sm text-yellow-800">
-          <p className="font-bold mb-1 uppercase tracking-tight">Access Control</p>
-          <p>Adding a staff member by email allows them to be automatically granted that role when they log in. Super Admins can manage all branding, roles, and showroom settings.</p>
+          <p className="font-bold mb-1 uppercase tracking-tight">Security Note</p>
+          <p>Changing an individual's email will require them to log in using the new address. You can manage roles and contact credentials here.</p>
         </div>
       </div>
     </div>
