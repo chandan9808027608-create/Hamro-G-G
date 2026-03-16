@@ -88,11 +88,11 @@ export function Footer() {
             </li>
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 shrink-0 text-white/60" />
-              <span>{contactPhone}</span>
+              <a href={`tel:${contactPhone}`} className="hover:text-white transition-colors">{contactPhone}</a>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-4 h-4 shrink-0 text-white/60" />
-              <span>{contactEmail}</span>
+              <a href={`mailto:${contactEmail}`} className="hover:text-white transition-colors">{contactEmail}</a>
             </li>
           </ul>
         </div>
