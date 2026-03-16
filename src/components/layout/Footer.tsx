@@ -17,9 +17,9 @@ export function Footer() {
 
   const logoImage = settings?.logo_url || PlaceHolderImages.find(img => img.id === 'logo')?.imageUrl;
   const businessName = settings?.business_name || "Hamro G&G Auto Enterprises";
-  const contactPhone = settings?.contact_phone || "9860087161";
-  const contactEmail = settings?.contact_email || "info@ggautonp.com";
-  const address = settings?.address || "Nayabasti, Boudha (Everest Petrol Pump)";
+  const contactPhone = settings?.contact_phone || CONTACT_INFO.phone;
+  const contactEmail = settings?.contact_email || CONTACT_INFO.email;
+  const address = settings?.address || CONTACT_INFO.address;
 
   const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}`;
 
@@ -46,7 +46,15 @@ export function Footer() {
             We offer sales, exchange, and servicing for all major brands.
           </p>
           <div className="flex gap-4">
-            <Link href="#" className="hover:text-secondary transition-colors"><Facebook className="w-5 h-5" /></Link>
+            <a 
+              href={CONTACT_INFO.facebook} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-secondary transition-colors"
+              title="Follow us on Facebook"
+            >
+              <Facebook className="w-5 h-5" />
+            </a>
             <a 
               href={whatsappUrl} 
               target="_blank" 
