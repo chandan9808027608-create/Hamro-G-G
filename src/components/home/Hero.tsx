@@ -109,7 +109,7 @@ export function Hero() {
             <div className="absolute -bottom-10 -right-10 bg-white p-6 rounded-2xl shadow-2xl animate-bounce-slow border border-gray-100">
               <div className="flex items-center gap-4">
                 <div className="bg-primary/10 p-4 rounded-xl">
-                  <span className="text-2xl font-bold text-primary">500+</span>
+                  <span className="text-2xl font-bold text-primary">2000+</span>
                 </div>
                 <div>
                   <p className="font-bold text-sm">Happy Riders</p>
