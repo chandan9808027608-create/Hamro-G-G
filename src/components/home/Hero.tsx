@@ -1,10 +1,23 @@
+
+"use client"
+
 import Link from 'next/link';
 import { ShieldCheck, BadgeCheck, Clock, ArrowRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 export function Hero() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-bike')?.imageUrl;
+  const db = useFirestore();
+  const settingsRef = useMemoFirebase(() => {
+    if (!db) return null;
+    return doc(db, 'settings', 'general');
+  }, [db]);
+  const { data: settings } = useDoc(settingsRef);
+
+  const defaultHero = PlaceHolderImages.find(img => img.id === 'hero-bike')?.imageUrl;
+  const heroImage = settings?.hero_image_url || defaultHero;
 
   return (
     <div className="relative min-h-[85vh] flex items-center overflow-hidden bg-white">
@@ -88,7 +101,7 @@ export function Hero() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-10 left-10 text-white space-y-2">
                 <div className="bg-primary px-3 py-1 rounded-full text-xs font-bold inline-block">TRENDING NOW</div>
-                <p className="text-3xl font-bold font-headline leading-tight">Yamaha MT-15 <br /> Edition 2024</p>
+                <p className="text-3xl font-bold font-headline leading-tight">Featured <br /> Collection 2024</p>
               </div>
             </div>
             

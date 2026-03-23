@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Shield, Clock, CheckCircle, ArrowRight, Calendar, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 import { Vehicle } from '@/types/vehicle';
 
 export default function Home() {
@@ -18,8 +18,16 @@ export default function Home() {
     return collection(db, 'vehicles');
   }, [db]);
 
+  const settingsRef = useMemoFirebase(() => {
+    if (!db) return null;
+    return doc(db, 'settings', 'general');
+  }, [db]);
+
   const { data: vehicles, isLoading } = useCollection<Vehicle>(vehiclesQuery);
+  const { data: settings } = useDoc(settingsRef);
+  
   const featuredVehicles = vehicles?.slice(0, 4) || [];
+  const serviceImage = settings?.service_image_url || "https://picsum.photos/seed/service/800/600";
 
   return (
     <div className="space-y-24 pb-20">
@@ -102,7 +110,12 @@ export default function Home() {
             </Button>
           </div>
           <div className="flex-1 relative group w-full lg:w-auto">
-            <img src="https://picsum.photos/seed/service/800/600" alt="Bike Service" className="relative w-full rounded-[2.5rem] shadow-2xl object-cover" />
+            <img 
+              src={serviceImage} 
+              alt="Bike Service" 
+              className="relative w-full rounded-[2.5rem] shadow-2xl object-cover aspect-[4/3]" 
+              data-ai-hint="motorcycle maintenance"
+            />
           </div>
         </div>
       </section>

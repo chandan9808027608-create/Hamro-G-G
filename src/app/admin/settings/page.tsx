@@ -15,11 +15,13 @@ import { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const settingsSchema = z.object({
-  logo_url: z.string().url("Please enter a valid URL"),
+  logo_url: z.string().url("Please enter a valid URL").or(z.literal("")),
   business_name: z.string().min(3),
   contact_phone: z.string().min(10),
   contact_email: z.string().email(),
   address: z.string().min(5),
+  hero_image_url: z.string().url("Please enter a valid URL").or(z.literal("")),
+  service_image_url: z.string().url("Please enter a valid URL").or(z.literal("")),
 });
 
 export default function SettingsPage() {
@@ -41,6 +43,8 @@ export default function SettingsPage() {
       contact_phone: "",
       contact_email: "",
       address: "",
+      hero_image_url: "",
+      service_image_url: "",
     },
   });
 
@@ -52,6 +56,8 @@ export default function SettingsPage() {
         contact_phone: settings.contact_phone || "9860087161",
         contact_email: settings.contact_email || "info@ggautonp.com",
         address: settings.address || "Nayabasti, Boudha",
+        hero_image_url: settings.hero_image_url || "",
+        service_image_url: settings.service_image_url || "",
       });
     }
   }, [settings, form]);
@@ -69,7 +75,7 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold font-headline flex items-center gap-3">
           <Settings className="w-8 h-8 text-primary" /> Site Settings
         </h1>
-        <p className="text-muted-foreground">Manage your showroom's online identity and Gmail/Contact info</p>
+        <p className="text-muted-foreground">Manage your showroom's online identity and branding</p>
       </div>
 
       <div className="bg-white rounded-[2.5rem] shadow-xl border overflow-hidden">
@@ -85,8 +91,8 @@ export default function SettingsPage() {
                 <div className="bg-gray-50 border-b px-8 py-4">
                   <TabsList className="bg-transparent gap-8">
                     <TabsTrigger value="showroom" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent font-bold">Showroom</TabsTrigger>
-                    <TabsTrigger value="branding" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent font-bold">Branding</TabsTrigger>
-                    <TabsTrigger value="contact" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent font-bold">Contact & Gmail</TabsTrigger>
+                    <TabsTrigger value="branding" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent font-bold">Branding & Images</TabsTrigger>
+                    <TabsTrigger value="contact" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent font-bold">Contact Details</TabsTrigger>
                   </TabsList>
                 </div>
 
@@ -128,11 +134,12 @@ export default function SettingsPage() {
                   </TabsContent>
 
                   <TabsContent value="branding" className="mt-0 space-y-8 animate-in fade-in slide-in-from-left-2 duration-300">
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                       <div className="flex items-center gap-2 border-b pb-4">
                         <ImageIcon className="w-5 h-5 text-primary" />
                         <h3 className="font-bold text-xl">Visual Assets</h3>
                       </div>
+                      
                       <FormField
                         control={form.control}
                         name="logo_url"
@@ -149,7 +156,51 @@ export default function SettingsPage() {
                                 )}
                               </div>
                             </FormControl>
-                            <FormDescription>This logo will appear on the Navbar and Footer.</FormDescription>
+                            <FormDescription>Appears on the Navbar and Footer.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="hero_image_url"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-bold uppercase tracking-widest">Hero Section Image URL</FormLabel>
+                            <FormControl>
+                              <div className="flex gap-4">
+                                <Input placeholder="https://..." className="h-12 rounded-xl bg-gray-50 focus:bg-white" {...field} />
+                                {field.value && (
+                                  <div className="w-20 h-12 border rounded-xl overflow-hidden shrink-0 bg-white shadow-sm">
+                                    <img src={field.value} alt="Hero preview" className="w-full h-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormDescription>Main image displayed on the homepage banner.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="service_image_url"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-bold uppercase tracking-widest">Maintenance Section Image URL</FormLabel>
+                            <FormControl>
+                              <div className="flex gap-4">
+                                <Input placeholder="https://..." className="h-12 rounded-xl bg-gray-50 focus:bg-white" {...field} />
+                                {field.value && (
+                                  <div className="w-20 h-12 border rounded-xl overflow-hidden shrink-0 bg-white shadow-sm">
+                                    <img src={field.value} alt="Service preview" className="w-full h-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormDescription>Image displayed next to the service booking section.</FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -169,7 +220,7 @@ export default function SettingsPage() {
                           name="contact_email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-xs font-bold uppercase tracking-widest">Business Gmail / Email</FormLabel>
+                              <FormLabel className="text-xs font-bold uppercase tracking-widest">Business Email</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

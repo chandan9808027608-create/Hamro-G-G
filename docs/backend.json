@@ -137,7 +137,9 @@
         "business_name": { "type": "string" },
         "contact_phone": { "type": "string" },
         "contact_email": { "type": "string" },
-        "address": { "type": "string" }
+        "address": { "type": "string" },
+        "hero_image_url": { "type": "string" },
+        "service_image_url": { "type": "string" }
       }
     }
   },
